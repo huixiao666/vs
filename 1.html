@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>sing-box 配置全面对比 | 1.14.0-alpha.18 vs Switzerland</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f5f7fb;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Noto Sans', 'Helvetica Neue', sans-serif;
+      padding: 2rem 1.5rem;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+      padding: 2.2rem 2rem;
+      transition: all 0.2s ease;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+    h1 small {
+      font-size: 1rem;
+      font-weight: 500;
+      background: #eef2ff;
+      color: #4338ca;
+      padding: 0.15rem 0.9rem;
+      border-radius: 2rem;
+      margin-left: 0.8rem;
+    }
+    .subtitle {
+      font-size: 1rem;
+      color: #475569;
+      margin-bottom: 2rem;
+      border-left: 4px solid #6366f1;
+      padding-left: 1rem;
+      background: #f8fafc;
+      border-radius: 0 0.8rem 0.8rem 0;
+      line-height: 1.6;
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      margin: 1.8rem 0 2.5rem;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.4rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .card:hover {
+      box-shadow: 0 10px 25px -8px rgba(0,0,0,0.08);
+      border-color: #cbd5e1;
+    }
+    .card h3 {
+      font-size: 1.3rem;
+      font-weight: 650;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 1.2rem;
+      color: #1e293b;
+    }
+    .badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.7rem;
+      border-radius: 2rem;
+      background: #f1f5f9;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge.primary {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+    .badge.warning {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+    .badge.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 1.2rem 0 0.5rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.7rem 0.5rem 0.7rem 0;
+      font-weight: 600;
+      color: #475569;
+      border-bottom: 1px solid #e2e8f0;
+      width: 35%;
+    }
+    td {
+      padding: 0.7rem 0.5rem 0.7rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: top;
+      color: #1e293b;
+    }
+    tr:last-child td, tr:last-child th {
+      border-bottom: none;
+    }
+    .highlight {
+      background: #fef9c3;
+      font-weight: 500;
+      padding: 0 0.2rem;
+      border-radius: 0.3rem;
+    }
+    .score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+    .score {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .verdict-box {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 1px solid #bae6fd;
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.8rem;
+      margin: 2rem 0 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .verdict-text {
+      font-size: 1.15rem;
+      font-weight: 500;
+    }
+    .winner {
+      font-weight: 700;
+      font-size: 1.4rem;
+      background: #0f172a;
+      color: white;
+      padding: 0.3rem 1.2rem;
+      border-radius: 2.5rem;
+    }
+    .pros-cons {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin: 1.8rem 0 1rem;
+    }
+    .pros, .cons {
+      flex: 1;
+      min-width: 200px;
+    }
+    .pros h4, .cons h4 {
+      font-size: 1rem;
+      font-weight: 650;
+      margin-bottom: 0.6rem;
+    }
+    ul {
+      padding-left: 1.4rem;
+    }
+    li {
+      margin-bottom: 0.4rem;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 1.8rem 0 1rem;
+    }
+    .footer-note {
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      text-align: right;
+    }
+    @media (max-width: 700px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+      body {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>
+    ⚖️ sing-box 配置深度对比
+    <small>1.14.0-alpha.18 vs Switzerland</small>
+  </h1>
+  <div class="subtitle">
+    <strong>左：用户当前配置 (1.14.0-alpha.18.json)</strong> · 多节点、均衡策略<br>
+    <strong>右：群友 Danny Luo 配置 (Switzerland.json)</strong> · 单节点、极度精细规则
+  </div>
+
+  <!-- 快速概览卡片 -->
+  <div class="comparison-grid">
+    <div class="card">
+      <h3><span class="badge primary">用户配置</span> 1.14.0-alpha.18</h3>
+      <table>
+        <tr><th>DNS 服务器</th><td>本地、hosts_fix、alidns-dot、alidns-quic、ggdns (DoH)、fakeip</td></tr>
+        <tr><th>DNS 策略</th><td>国内直连 + 指定域名 fakeip / 最终 Google DNS</td></tr>
+        <tr><th>路由规则数</th><td>~22 条 (含 sniff, hijack-dns, 规则集, 私有 IP)</td></tr>
+        <tr><th>出站节点</th><td><strong>14 个 VLESS 节点</strong> + urltest 自动测速</td></tr>
+        <tr><th>Final 兜底</th><td><span class="highlight">PROXY</span> (默认代理)</td></tr>
+        <tr><th>实验性</th><td>Clash API, 缓存, gc_percent=50, 内存限制 200MB</td></tr>
+        <tr><th>风格</th><td>通用型、防污染、多节点容错</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3><span class="badge warning">群友配置</span> Switzerland</h3>
+      <table>
+        <tr><th>DNS 服务器</th><td>direct_dns (QUIC), proxy_dns (QUIC), dns.google (H3), local, fakeip, hosts (更多预定义)</td></tr>
+        <tr><th>DNS 策略</th><td>规则集驱动：Filter/Ads/ChinaMax/Google 精确分流，fakeip 过滤增强</td></tr>
+        <tr><th>路由规则数</th><td><strong>~28 条</strong> (含 sniff, route-options, 大量 reject, 协议阻断, IPv6 控制)</td></tr>
+        <tr><th>出站节点</th><td><strong>仅 1 个 Reality 节点</strong> (Switzerland)</td></tr>
+        <tr><th>Final 兜底</th><td><span class="highlight" style="background:#fee2e2;">REJECT-DROP</span> (默认拒绝)</td></tr>
+        <tr><th>实验性</th><td>Clash API, 缓存, gc_percent=200, 内存限制 1024MB</td></tr>
+        <tr><th>风格</th><td>极客型、高隐私、严格流控</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 详细对比表格 -->
+  <h2 style="margin-top: 2rem; font-weight: 650;">📊 逐项技术对比</h2>
+  <div style="overflow-x: auto;">
+    <table style="min-width: 700px; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 0.5rem;">
+      <thead>
+        <tr style="background: #f8fafc;">
+          <th style="width: 20%;">维度</th>
+          <th style="width: 40%;">用户 (1.14.0-alpha.18)</th>
+          <th style="width: 40%;">群友 (Switzerland)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>DNS 完整度</strong></td>
+          <td>✅ 基础但实用：国内走阿里 QUIC/DoT，国外走 Google DoH + fakeip。hosts 固定部分关键域名。</td>
+          <td>🏆 <strong>更全面</strong>：国内走阿里 QUIC，国外走 AdGuard QUIC + Google H3，引入 fakeip-filter 规则集，DNS 层面去广告/防跟踪，且 hosts 预定义更丰富。</td>
+        </tr>
+        <tr>
+          <td><strong>DNS 分流逻辑</strong></td>
+          <td>按域名后缀分流，fakeip 用于代理列表和游戏/AI。cn 域名走国内 DNS。</td>
+          <td>规则集驱动：private/Filter/ChinaMax/Apple 等走国内，Proxy/gfw/Google 等走 fakeip，并含有 evaluate 和 geoip 响应路由，更精细。</td>
+        </tr>
+        <tr>
+          <td><strong>路由 sniff 嗅探</strong></td>
+          <td>全局 sniff (两条 sniff 规则，第二条有效)。</td>
+          <td>sniff 置于顶部，但排除了 Mijia Cloud 和 push.apple.com，并 invert 了 telegram_ip，更精准地避免误嗅探。</td>
+        </tr>
+        <tr>
+          <td><strong>hijack-dns 位置</strong></td>
+          <td>在私有 IP 直连之前，正确劫持 DNS 查询。</td>
+          <td>在 sniff 之后、大量拒绝规则之前，位置合理。</td>
+        </tr>
+        <tr>
+          <td><strong>协议与端口过滤</strong></td>
+          <td>阻断 QUIC 443（强制 TCP），阻断 STUN/WebRTC 相关端口。</td>
+          <td>🏆 <strong>更激进</strong>：阻断 STUN/QUIC/DTLS 协议，额外屏蔽腾讯灯塔、彩云等跟踪域名，并丢弃 IPv6 非全球单播地址。</td>
+        </tr>
+        <tr>
+          <td><strong>规则集丰富度</strong></td>
+          <td>使用 geosite 和自定义规则集：proxy, games, ai, cn, private, telegramip, cnip 等，基本覆盖。</td>
+          <td>🏆 <strong>更多样</strong>：除常见规则集外，还有 Applications, OnePlus, Android, fcm, GlobalMedia, httpDNS, DNSreject, Ads, adobe 等，针对性更强。</td>
+        </tr>
+        <tr>
+          <td><strong>出站容错能力</strong></td>
+          <td>🏆 <strong>极强</strong>：14 个 VLESS 节点，urltest 自动选择最优，selector 可手动切换，PROXY 组内含 DIRECT 降级。</td>
+          <td>⚠️ 单节点：仅一个 Reality 节点。若节点失效，全局断流（除非手动切换 Final 到 direct，但默认 REJECT）。</td>
+        </tr>
+        <tr>
+          <td><strong>Final 策略</strong></td>
+          <td>默认 <strong>PROXY</strong>：未匹配流量走代理，安全且不易漏网。</td>
+          <td>默认 <strong>REJECT-DROP</strong>：未匹配流量直接丢弃。虽隐私保护强，但容易误伤小众国外服务（需频繁维护规则）。</td>
+        </tr>
+        <tr>
+          <td><strong>内存与 GC 调优</strong></td>
+          <td>gc_percent=50，内存限制 200MB。较保守，低内存设备友好。</td>
+          <td>gc_percent=200，内存限制 1024MB。允许更高内存占用，但 GC 触发较晚，错误规则下可能 OOM。</td>
+        </tr>
+        <tr>
+          <td><strong>实验性功能</strong></td>
+          <td>Clash API + cache_file (store_fakeip/dns)。</td>
+          <td>同样具备，同时 tun 栈使用 gvisor，支持 endpoint_independent_nat，并配置了 http_proxy 回环。</td>
+        </tr>
+        <tr>
+          <td><strong>IPv6 处理</strong></td>
+          <td>未显式处理 IPv6 路由。</td>
+          <td>🏆 明确拒绝非全球单播 IPv6 地址，并配置了 fakeip 的 IPv6 范围 fc00::/18。</td>
+        </tr>
+        <tr>
+          <td><strong>隐私与抗追踪</strong></td>
+          <td>有广告规则集拦截。</td>
+          <td>🏆 <strong>多维度</strong>：DNS 广告过滤、路由直接 drop 跟踪域名、httpDNS 规则集、伪造 NOERROR 响应等。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 综合评判 -->
+  <div class="verdict-box">
+    <div>
+      <div class="verdict-text" style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem;">🏅 综合实力判定</div>
+      <div style="color: #334155;">技术全面性 & 规则精细度：<span class="winner" style="background:#b45309;">Switzerland 胜出</span><br>
+      可用性 & 容错 & 日常稳定性：<span class="winner" style="background:#166534;">1.14.0-alpha.18 胜出</span></div>
+    </div>
+    <div style="font-size: 2.5rem; font-weight: 800; color: #0f172a;">⚔️</div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>✅ 群友 Danny Luo 配置亮点</h4>
+      <ul>
+        <li>DNS 与路由规则如同“瑞士军刀”，覆盖隐私、去广告、协议阻断、IPv6 控制。</li>
+        <li>fakeip-filter 与 DNS 规则集联动，降低了假 IP 污染。</li>
+        <li>主动丢弃未知流量（REJECT-DROP），适合对安全要求偏执的场景。</li>
+        <li>整体结构清晰，适合单节点极致优化。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>⚠️ 潜在短板</h4>
+      <ul>
+        <li><strong>单节点风险极大</strong>，无自动故障转移。</li>
+        <li>Final 为 REJECT-DROP 需要使用者非常了解规则集覆盖范围，否则正常网站被断流。</li>
+        <li>内存限制较高，错误配置时曾导致手机过热 (bypass 风暴)。</li>
+        <li>部分 DNS 服务器（AdGuard QUIC）可能在国内被干扰，导致解析延迟。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>✅ 用户配置 (1.14.0-alpha.18) 亮点</h4>
+      <ul>
+        <li>14 个节点 + urltest 自动选择，高可用且延迟最优。</li>
+        <li>Final 默认 proxy，避免“误杀”小众网站。</li>
+        <li>内存占用控制优秀，适合手机长期运行。</li>
+        <li>规则简洁但够用，维护成本低。</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>⚠️ 可提升之处</h4>
+      <ul>
+        <li>DNS 没有引入广告过滤/跟踪器屏蔽。</li>
+        <li>缺少对 STUN/DTLS 等协议的系统性阻断（目前仅端口屏蔽）。</li>
+        <li>IPv6 路由未显式控制，在纯 IPv6 环境下可能出现泄漏。</li>
+        <li>fakeip 规则较简单，未使用 filter 规则集。</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+  <div style="background: #f1f5f9; border-radius: 1.2rem; padding: 1.2rem 1.5rem;">
+    <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">📌 结论：谁更强？</p>
+    <p style="margin-bottom: 0.8rem;">
+      <strong>如果比拼“规则工程的精细度与安全防护的全面性”</strong> —— <span style="background: #fed7aa; padding:0.1rem 0.6rem; border-radius: 0.4rem;">Danny Luo 的 Switzerland 配置更强</span>，它几乎把 sing-box 的路由、DNS 能力压榨到了极致，堪称“规则教科书”。<br>
+      <strong>如果比拼“日常使用可靠性、多节点容错与省心程度”</strong> —— <span style="background: #bbf7d0; padding:0.1rem 0.6rem; border-radius: 0.4rem;">你的 1.14.0-alpha.18 配置更强</span>，更适应国内网络波动，且不易因规则遗漏而断网。
+    </p>
+    <p>
+      💡 <em>两者并非绝对优劣，而是设计哲学不同：一个追求极致控制与隐私（瑞士军刀），一个追求稳定与高可用（均衡舰队）。若能将 Switzerland 的 DNS/路由规则与你的多节点出站结合，便是真正的“完全体”。</em>
+    </p>
+  </div>
+  <div class="footer-note">
+    * 对比基于提供的两份配置，已隐去节点信息。内存/GC 参数已考虑群友之前因规则排序导致冒烟的特殊情况。
+  </div>
+</div>
+</body>
+</html>
