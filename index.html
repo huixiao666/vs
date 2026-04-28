@@ -2,28 +2,20 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sing-Box 配置全面对比分析 - 1.14.0-alpha.18 vs Switzerland</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sing-Box 配置全维度对比分析大屏</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <!-- 移除中国地图依赖，以避免加载失败 -->
     <style>
         :root {
-            --bg: #0d1117;
-            --card-bg: #161b22;
-            --border: #30363d;
-            --text: #e6edf3;
-            --text-secondary: #8b949e;
-            --accent1: #58a6ff;
-            --accent2: #f78166;
-            --accent3: #3fb950;
-            --accent4: #d2a8ff;
-            --accent5: #f0c929;
-            --accent6: #ff7b72;
-            --accent7: #79c0ff;
-            --accent8: #a5d6ff;
-            --gradient-user: linear-gradient(135deg, #58a6ff, #3fb950);
-            --gradient-friend: linear-gradient(135deg, #f78166, #d2a8ff);
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --bg: #0a0e17;
+            --panel-bg: #111827;
+            --border: #1e293b;
+            --text: #c8d6e5;
+            --text-bright: #f1f5f9;
+            --user-color: #f59e0b;
+            --user-glow: rgba(245, 158, 11, 0.6);
+            --golden: #fbbf24;
         }
 
         * {
@@ -35,969 +27,547 @@
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
-            line-height: 1.6;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
             min-height: 100vh;
-            padding: 16px;
-            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(245, 158, 11, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 60%, rgba(59, 130, 246, 0.04) 0%, transparent 60%);
         }
 
-        .container {
-            max-width: 1400px;
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header .title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #000;
+            font-weight: 900;
+            box-shadow: 0 0 24px rgba(245, 158, 11, 0.5);
+            animation: pulse-logo 2s ease-in-out infinite;
+        }
+        @keyframes pulse-logo {
+            0%, 100% { box-shadow: 0 0 24px rgba(245, 158, 11, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(245, 158, 11, 0.8); }
+        }
+        .header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-bright); }
+        .subtitle { font-size: 0.75rem; color: #94a3b8; letter-spacing: 2px; }
+        .badge-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .badge-user {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            animation: badge-glow 2s infinite;
+        }
+        @keyframes badge-glow {
+            0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.7); }
+        }
+        .badge-count { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+        .badge-live { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 16px 20px 30px;
+            max-width: 1600px;
             margin: 0 auto;
         }
+        @media (max-width: 1400px) { .main-container { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 900px) { .main-container { grid-template-columns: 1fr; } }
 
-        header {
-            text-align: center;
-            padding: 32px 20px 24px;
-            position: relative;
-        }
-        header h1 {
-            font-size: clamp(1.4rem, 3vw, 2rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #58a6ff, #d2a8ff, #f78166);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 6px;
-        }
-        header .subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            letter-spacing: 0.02em;
-        }
-
-        .legend-row {
-            display: flex;
-            justify-content: center;
-            gap: 28px;
-            flex-wrap: wrap;
-            margin: 8px 0 16px;
-            font-size: 0.85rem;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-        .legend-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-            display: inline-block;
-            flex-shrink: 0;
-        }
-        .legend-dot.user {
-            background: var(--gradient-user);
-            box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
-        }
-        .legend-dot.friend {
-            background: var(--gradient-friend);
-            box-shadow: 0 0 10px rgba(247, 129, 102, 0.5);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-            gap: 18px;
-            margin-bottom: 18px;
-        }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 18px;
-            margin-bottom: 18px;
-        }
-        .grid-full {
-            grid-column: 1 / -1;
-        }
-
-        .card {
-            background: var(--card-bg);
+        .panel {
+            background: var(--panel-bg);
             border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 20px 18px;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            overflow: hidden;
+            padding: 16px 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: 0.3s;
         }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        .panel:hover { border-color: #334155; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        .panel.user-highlight { border-color: rgba(245,158,11,0.5); box-shadow: 0 0 28px rgba(245,158,11,0.15); }
+        .panel.user-highlight::before {
+            content: '';
+            position: absolute; top:0; left:0; right:0; height:2px;
+            background: linear-gradient(90deg, transparent, #f59e0b, #fbbf24, #f59e0b, transparent);
+            animation: shimmer 2s infinite;
         }
-        .card h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            letter-spacing: -0.01em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .card h3 .icon {
-            font-size: 1.3rem;
-        }
-        .card .desc {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-        .card .chart-wrap {
-            position: relative;
-            width: 100%;
-            height: 280px;
-        }
-        .card .chart-wrap.tall {
-            height: 330px;
-        }
-        .card .chart-wrap.short {
-            height: 220px;
-        }
-        .card .chart-wrap.xshort {
-            height: 180px;
-        }
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
+        @keyframes shimmer { 0%,100%{opacity:0.6;} 50%{opacity:1;} }
 
-        .highlight-box {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-        }
-        .highlight-tag {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.73rem;
-            font-weight: 500;
-            letter-spacing: 0.01em;
-            white-space: nowrap;
-        }
-        .tag-user {
-            background: rgba(88, 166, 255, 0.18);
-            color: #58a6ff;
-            border: 1px solid rgba(88, 166, 255, 0.35);
-        }
-        .tag-friend {
-            background: rgba(247, 129, 102, 0.18);
-            color: #f78166;
-            border: 1px solid rgba(247, 129, 102, 0.35);
-        }
-        .tag-both {
-            background: rgba(210, 168, 255, 0.18);
-            color: #d2a8ff;
-            border: 1px solid rgba(210, 168, 255, 0.35);
-        }
-        .tag-neutral {
-            background: rgba(139, 148, 158, 0.15);
-            color: #8b949e;
-            border: 1px solid rgba(139, 148, 158, 0.3);
-        }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; }
+        .panel-title { font-size: 0.95rem; font-weight: 700; color: var(--text-bright); display: flex; align-items: center; gap: 8px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot-gold { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        .dot-blue { background: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
+        .dot-green { background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .dot-purple { background: #8b5cf6; }
+        .dot-cyan { background: #06b6d4; }
+        .dot-orange { background: #f97316; }
+        .chart-wrap { width: 100%; }
+        .span-2 { grid-column: span 2; }
+        .full-width { grid-column: 1 / -1; }
+        @media (max-width: 1400px) { .span-2 { grid-column: span 1; } }
 
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.78rem;
-            margin-top: 8px;
+        .stat-cards { display: flex; gap: 12px; flex-wrap: wrap; }
+        .stat-card {
+            flex: 1; min-width: 100px; background: rgba(30,41,59,0.7);
+            border-radius: 10px; padding: 12px 14px; text-align: center; border: 1px solid var(--border);
         }
-        .summary-table th,
-        .summary-table td {
-            padding: 8px 10px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
-        .summary-table th {
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .summary-table .val-user {
-            color: #58a6ff;
-            font-weight: 600;
-        }
-        .summary-table .val-friend {
-            color: #f78166;
-            font-weight: 600;
-        }
-        .summary-table .val-equal {
-            color: #8b949e;
-        }
+        .stat-card .value { font-size: 1.8rem; font-weight: 800; color: var(--text-bright); }
+        .stat-card .label { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; }
+        .stat-card.gold .value { color: #fbbf24; }
+        .stat-card.blue .value { color: #60a5fa; }
+        .stat-card.green .value { color: #34d399; }
+        .stat-card.red .value { color: #f87171; }
 
-        .winner-badge {
-            display: inline-block;
-            font-size: 0.65rem;
-            padding: 2px 7px;
-            border-radius: 10px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            vertical-align: middle;
-            margin-left: 4px;
+        .rank-table {
+            width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem;
         }
-        .winner-user {
-            background: rgba(88, 166, 255, 0.2);
-            color: #58a6ff;
+        .rank-table th {
+            text-align: left; padding: 10px 6px; color: #94a3b8; font-weight: 600; border-bottom: 1px solid #1e293b;
         }
-        .winner-friend {
-            background: rgba(247, 129, 102, 0.2);
-            color: #f78166;
+        .rank-table td {
+            padding: 8px 6px; border-bottom: 1px solid #1e293b; color: #c8d6e5;
         }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            letter-spacing: 0.03em;
+        .rank-table tr.user-row { background: rgba(245,158,11,0.12); }
+        .rank-table .score { font-weight: 700; color: #fbbf24; }
+        .rank-badge {
+            display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center;
+            border-radius: 50%; font-weight: 700; font-size: 0.75rem; background: #1e293b;
         }
-
-        @media (max-width: 480px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            .grid-3 {
-                grid-template-columns: 1fr;
-            }
-            .card .chart-wrap {
-                height: 230px;
-            }
-            .card .chart-wrap.tall {
-                height: 260px;
-            }
-            header h1 {
-                font-size: 1.2rem;
-            }
-        }
+        .rank-badge.gold { background: #f59e0b; color: #000; }
+        .footer-note { text-align: center; padding: 12px; font-size: 0.7rem; color: #475569; grid-column: 1 / -1; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <header>
-            <h1>🔍 Sing-Box 配置全面对比分析</h1>
-            <p class="subtitle">1.14.0-alpha.18（皮卡皮卡配置） vs Switzerland（Danny Luo配置） · 全方位模块级对比</p>
-            <div class="legend-row">
-                <span class="legend-item"><span class="legend-dot user"></span> 皮卡皮卡配置 (alpha.18)</span>
-                <span class="legend-item"><span class="legend-dot friend"></span> Danny Luo配置 (Switzerland)</span>
-            </div>
-        </header>
-
-        <!-- ==================== 第一行：规模总览 ==================== -->
-        <div class="grid-3">
-            <!-- 卡片1：配置规模总览 -->
-            <div class="card">
-                <h3><span class="icon">📊</span>配置规模总览</h3>
-                <p class="desc">DNS服务器·规则·路由规则·规则集·出/入站数量对比</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartScale"></canvas>
-                </div>
-                <div class="highlight-box">
-                    <span class="highlight-tag tag-user">皮卡皮卡规则集+9个</span>
-                    <span class="highlight-tag tag-user">DNS规则+2条</span>
-                    <span class="highlight-tag tag-friend">入站参数更丰富</span>
-                </div>
-            </div>
-
-            <!-- 卡片2：DNS专项对比 -->
-            <div class="card">
-                <h3><span class="icon">🌐</span>DNS服务器分布</h3>
-                <p class="desc">各类型DNS服务器数量：local / hosts / DoT / DoH / DoQ / fakeip / H3</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartDnsServers"></canvas>
-                </div>
-                <div class="highlight-box">
-                    <span class="highlight-tag tag-user">你有DoT(alidns-dot)</span>
-                    <span class="highlight-tag tag-friend">Danny Luo有H3(dns.google)</span>
-                    <span class="highlight-tag tag-both">均有fakeip+hosts</span>
-                </div>
-            </div>
-
-            <!-- 卡片3：DNS缓存与性能 -->
-            <div class="card">
-                <h3><span class="icon">⚡</span>DNS缓存容量 & 日志级别</h3>
-                <p class="desc">cache_capacity对比（皮卡皮卡65536 vs Danny Luo8192）· 日志级别量化</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartCacheLog"></canvas>
-                </div>
-                <div class="highlight-box">
-                    <span class="highlight-tag tag-user">缓存容量8倍于Danny Luo</span>
-                    <span class="highlight-tag tag-user">日志trace级更详细</span>
-                    <span class="highlight-tag tag-friend">Danny Luowarn级更安静</span>
-                </div>
-            </div>
+<div class="header">
+    <div class="title-group">
+        <div class="logo-icon">⚡</div>
+        <div>
+            <h1>Sing-Box 配置全维度对比分析</h1>
+            <div class="subtitle">MULTI-DIMENSIONAL BENCHMARK</div>
         </div>
+    </div>
+    <div class="badge-row">
+        <span class="badge badge-user">⭐ 您的配置：皮卡皮卡配置</span>
+        <span class="badge badge-count">📋 共对比 12 套配置</span>
+        <span class="badge badge-live">● 实时分析</span>
+    </div>
+</div>
 
-        <!-- ==================== 第二行：路由&规则集 ==================== -->
-        <div class="grid">
-            <!-- 卡片4：路由规则分类对比 -->
-            <div class="card">
-                <h3><span class="icon">🗺️</span>路由规则分类对比</h3>
-                <p class="desc">按动作类型统计：reject/drop · outbound直连 · outbound代理 · hijack-dns · 其他</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartRouteRules"></canvas>
-                </div>
-            </div>
-
-            <!-- 卡片5：规则集来源分布 -->
-            <div class="card">
-                <h3><span class="icon">📦</span>规则集来源分布</h3>
-                <p class="desc">按来源统计：SagerNet · DustinWin · MetaCubeX · senshinya · 其他</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartRuleSetSources"></canvas>
-                </div>
-            </div>
+<div class="main-container">
+    <!-- 统计卡片 -->
+    <div class="panel full-width" style="padding:12px 16px;">
+        <div class="stat-cards">
+            <div class="stat-card gold"><div class="value" id="statUserRank">--</div><div class="label">您的综合排名</div></div>
+            <div class="stat-card blue"><div class="value">12</div><div class="label">对比配置总数</div></div>
+            <div class="stat-card green"><div class="value" id="statMaxDNS">--</div><div class="label">最多DNS服务器</div></div>
+            <div class="stat-card red"><div class="value" id="statMaxRoutes">--</div><div class="label">最多路由规则</div></div>
+            <div class="stat-card"><div class="value" id="statMaxOutbounds">--</div><div class="label">最多出站数量</div></div>
+            <div class="stat-card blue"><div class="value" id="statMaxRuleSets">--</div><div class="label">最多规则集</div></div>
         </div>
-
-        <!-- ==================== 第三行：功能特性矩阵 ==================== -->
-        <div class="grid-3">
-            <!-- 卡片6：入站特性对比 -->
-            <div class="card">
-                <h3><span class="icon">📥</span>入站(TUN)特性支持</h3>
-                <p class="desc">strict_route · endpoint_independent_nat · stack类型 · route_exclude · platform代理等</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartInbound"></canvas>
-                </div>
-            </div>
-
-            <!-- 卡片7：出站策略对比 -->
-            <div class="card">
-                <h3><span class="icon">📤</span>出站策略对比</h3>
-                <p class="desc">selector嵌套层级 · urltest自动测速 · 策略组数量</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartOutbound"></canvas>
-                </div>
-            </div>
-
-            <!-- 卡片8：高级功能支持矩阵 -->
-            <div class="card">
-                <h3><span class="icon">🔧</span>高级功能支持矩阵</h3>
-                <p class="desc">reality · optimistic DNS · sniff · utls · tcp_fast_open · udp_fragment等</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartFeatures"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== 第四行：DNS规则动作分布 + 综合评分 ==================== -->
-        <div class="grid">
-            <!-- 卡片9：DNS规则动作分布 -->
-            <div class="card">
-                <h3><span class="icon">🎯</span>DNS规则动作分布</h3>
-                <p class="desc">reject · predefined(NOERROR) · route(指定服务器) · evaluate · respond等</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartDnsActions"></canvas>
-                </div>
-            </div>
-
-            <!-- 卡片10：综合能力雷达图 -->
-            <div class="card">
-                <h3><span class="icon">🎖️</span>综合能力雷达图</h3>
-                <p class="desc">8维度综合评估：去广告·隐私保护·性能·灵活性·稳定性·覆盖度·精细化·扩展性</p>
-                <div class="chart-wrap tall">
-                    <canvas id="chartRadar"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== 第五行：细节对比表 ==================== -->
-        <div class="card" style="margin-bottom:18px;">
-            <h3><span class="icon">📋</span>关键参数逐项对比表</h3>
-            <p class="desc">覆盖DNS、入站、出站、路由、实验性功能等核心参数</p>
-            <div style="overflow-x:auto;">
-                <table class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>对比维度</th>
-                            <th>具体参数</th>
-                            <th>皮卡皮卡配置</th>
-                            <th>Danny Luo配置</th>
-                            <th>差异说明</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td rowspan="3">📝 日志</td>
-                            <td>级别</td>
-                            <td class="val-user">trace</td>
-                            <td class="val-friend">warn</td>
-                            <td>皮卡皮卡更详细(调试用)，Danny Luo更安静(生产用)</td>
-                        </tr>
-                        <tr>
-                            <td>timestamp</td>
-                            <td class="val-equal">✅ true</td>
-                            <td class="val-equal">✅ true</td>
-                            <td>一致</td>
-                        </tr>
-                        <tr>
-                            <td>disabled</td>
-                            <td class="val-equal">未设置(false)</td>
-                            <td class="val-equal">false</td>
-                            <td>一致</td>
-                        </tr>
-                        <tr>
-                            <td rowspan="5">🌐 DNS</td>
-                            <td>服务器总数</td>
-                            <td class="val-user">7个</td>
-                            <td class="val-friend">6个</td>
-                            <td>你多1个(有独立DoT)</td>
-                        </tr>
-                        <tr>
-                            <td>缓存容量</td>
-                            <td class="val-user">65,536 <span class="winner-badge winner-user">8x</span></td>
-                            <td class="val-friend">8,192</td>
-                            <td>皮卡皮卡缓存容量是Danny Luo的8倍</td>
-                        </tr>
-                        <tr>
-                            <td>optimistic</td>
-                            <td class="val-equal">✅ true</td>
-                            <td class="val-equal">✅ enabled:true, timeout:7d</td>
-                            <td>Danny Luo额外设置了7天超时</td>
-                        </tr>
-                        <tr>
-                            <td>strategy</td>
-                            <td class="val-equal">prefer_ipv4</td>
-                            <td class="val-equal">prefer_ipv4</td>
-                            <td>一致</td>
-                        </tr>
-                        <tr>
-                            <td>reverse_mapping</td>
-                            <td class="val-equal">✅ true</td>
-                            <td class="val-equal">✅ true</td>
-                            <td>一致</td>
-                        </tr>
-                        <tr>
-                            <td rowspan="3">📥 入站</td>
-                            <td>TUN stack</td>
-                            <td class="val-user">mixed</td>
-                            <td class="val-friend">gvisor</td>
-                            <td>不同实现，gvisor更隔离</td>
-                        </tr>
-                        <tr>
-                            <td>mixed端口</td>
-                            <td class="val-user">7890</td>
-                            <td class="val-friend">8543</td>
-                            <td>端口不同</td>
-                        </tr>
-                        <tr>
-                            <td>TUN地址</td>
-                            <td class="val-user">10.8.0.1/24</td>
-                            <td class="val-friend">172.19.0.1/30 + IPv6</td>
-                            <td>Danny Luo有IPv6 TUN地址</td>
-                        </tr>
-                        <tr>
-                            <td rowspan="4">📤 出站</td>
-                            <td>urltest自动测速</td>
-                            <td class="val-user">✅ AUTO (14节点)</td>
-                            <td class="val-friend">❌ 无</td>
-                            <td>独有功能，自动选最优节点</td>
-                        </tr>
-                        <tr>
-                            <td>CN策略组</td>
-                            <td class="val-user">✅ CN selector</td>
-                            <td class="val-friend">❌ 无独立CN组</td>
-                            <td>你有独立中国流量策略组</td>
-                        </tr>
-                        <tr>
-                            <td>GLOBAL策略组</td>
-                            <td class="val-user">✅ GLOBAL selector</td>
-                            <td class="val-friend">❌ 无</td>
-                            <td>你有全局策略切换组</td>
-                        </tr>
-                        <tr>
-                            <td>reality</td>
-                            <td class="val-friend">❌ 无(使用WS+TLS)</td>
-                            <td class="val-user">✅ reality+xtls-flow</td>
-                            <td>Danny Luo使用reality协议</td>
-                        </tr>
-                        <tr>
-                            <td rowspan="3">🧪 实验性</td>
-                            <td>clash_api secret</td>
-                            <td class="val-equal">✅ 已设置</td>
-                            <td class="val-equal">✅ 已设置</td>
-                            <td>一致</td>
-                        </tr>
-                        <tr>
-                            <td>debug memory_limit</td>
-                            <td class="val-user">400MB</td>
-                            <td class="val-friend">1024MB</td>
-                            <td>Danny Luo内存上限更高</td>
-                        </tr>
-                        <tr>
-                            <td>debug gc_percent</td>
-                            <td class="val-user">100</td>
-                            <td class="val-friend">200</td>
-                            <td>Danny LuoGC触发阈值更高</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 总结卡片 -->
-        <div class="card" style="border-left: 3px solid #d2a8ff; margin-bottom:18px;">
-            <h3><span class="icon">💡</span>对比总结</h3>
-            <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:8px;font-size:0.85rem;">
-                <div style="flex:1;min-width:250px;padding:12px;background:rgba(88,166,255,0.08);border-radius:10px;">
-                    <strong style="color:#58a6ff;">🔵 皮卡皮卡配置优势：</strong>
-                    <ul style="margin:8px 0 0 16px;color:#c9d1d9;">
-                        <li>DNS缓存容量大(65536)，查询效率更高</li>
-                        <li>urltest自动测速，14节点自动选优</li>
-                        <li>独立CN/GLOBAL策略组，切换灵活</li>
-                        <li>trace日志便于深度调试</li>
-                        <li>规则集覆盖更广(+9个远程规则集)</li>
-                        <li>DoT独立服务器，国内解析更稳定</li>
-                    </ul>
-                </div>
-                <div style="flex:1;min-width:250px;padding:12px;background:rgba(247,129,102,0.08);border-radius:10px;">
-                    <strong style="color:#f78166;">🟠 Danny Luo配置优势：</strong>
-                    <ul style="margin:8px 0 0 16px;color:#c9d1d9;">
-                        <li>gvisor TUN栈更安全隔离</li>
-                        <li>reality协议抗封锁能力更强</li>
-                        <li>endpoint_independent_nat NAT穿透更好</li>
-                        <li>route_exclude_address_set智能分流</li>
-                        <li>platform http_proxy兼容性更佳</li>
-                        <li>H3(HTTP/3)DNS over QUIC更现代</li>
-                        <li>warn日志级别减少性能开销</li>
-                    </ul>
-                </div>
-                <div style="flex:1;min-width:250px;padding:12px;background:rgba(210,168,255,0.08);border-radius:10px;">
-                    <strong style="color:#d2a8ff;">🟣 共同优秀实践：</strong>
-                    <ul style="margin:8px 0 0 16px;color:#c9d1d9;">
-                        <li>均启用fakeip加速响应</li>
-                        <li>均有clash_api便于外部管理</li>
-                        <li>均启用optimistic DNS缓存</li>
-                        <li>均配置了hosts预定义解析</li>
-                        <li>均启用sniff协议嗅探</li>
-                        <li>均使用prefer_ipv4策略</li>
-                        <li>均配置了广告/跟踪拦截规则</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            📊 Sing-Box Config Comparison Dashboard · 基于1.14.0-alpha.18日志分析 · 全面模块级对比 · 仅供参考
-        </footer>
     </div>
 
-    <script>
-        // ============ 通用Chart.js配置 ============
-        Chart.defaults.font.family = "'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans SC',system-ui,sans-serif";
-        Chart.defaults.font.size = 11;
-        Chart.defaults.color = '#8b949e';
-        Chart.defaults.plugins.tooltip.backgroundColor = '#1c2128';
-        Chart.defaults.plugins.tooltip.borderColor = '#30363d';
-        Chart.defaults.plugins.tooltip.borderWidth = 1;
-        Chart.defaults.plugins.tooltip.padding = 10;
-        Chart.defaults.plugins.tooltip.titleFont = { size: 12, weight: 'bold' };
-        Chart.defaults.plugins.tooltip.bodyFont = { size: 11 };
-        Chart.defaults.plugins.legend.labels.usePointStyle = true;
-        Chart.defaults.plugins.legend.labels.pointStyleWidth = 10;
-        Chart.defaults.plugins.legend.labels.padding = 16;
+    <!-- 第1行：雷达图 + DNS柱状图 -->
+    <div class="panel user-highlight span-2" style="min-height:420px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-gold"></span>综合能力雷达图</span><span style="font-size:0.7rem;color:#94a3b8;">峰值越高越丰富</span></div>
+        <div class="chart-wrap" id="chartRadar" style="height:370px;"></div>
+    </div>
+    <div class="panel" style="min-height:420px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-blue"></span>DNS配置深度</span><span style="font-size:0.7rem;color:#94a3b8;">服务器数+规则数</span></div>
+        <div class="chart-wrap" id="chartDNSBar" style="height:370px;"></div>
+    </div>
 
-        const userColor = '#58a6ff';
-        const userColorBg = 'rgba(88,166,255,0.25)';
-        const userColorBorder = 'rgba(88,166,255,0.7)';
-        const friendColor = '#f78166';
-        const friendColorBg = 'rgba(247,129,102,0.25)';
-        const friendColorBorder = 'rgba(247,129,102,0.7)';
-        const gridColor = 'rgba(48,54,61,0.5)';
+    <!-- 第2行：路由规则&规则集 + 出站数量 -->
+    <div class="panel span-2" style="min-height:400px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-purple"></span>路由规则 & 规则集数量</span><span style="font-size:0.7rem;color:#94a3b8;">分组柱状图</span></div>
+        <div class="chart-wrap" id="chartRouteRuleSet" style="height:350px;"></div>
+    </div>
+    <div class="panel" style="min-height:400px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-cyan"></span>出站(Outbound)数量</span><span style="font-size:0.7rem;color:#94a3b8;">横向柱状图</span></div>
+        <div class="chart-wrap" id="chartOutboundBar" style="height:350px;"></div>
+    </div>
 
-        // ============ 图表1：配置规模总览 ============
-        new Chart(document.getElementById('chartScale'), {
-            type: 'bar',
-            data: {
-                labels: ['DNS服务器', 'DNS规则', '路由规则', '规则集(远程)', '出站(不含节点)', '入站'],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [7, 16, 26, 34, 7, 2],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [6, 14, 20, 25, 6, 2],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 10 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 5 },
-                        beginAtZero: true, title: { display: true, text: '数量', color: '#8b949e' } }
-                }
-            }
+    <!-- 第3行：热力图 + 入站堆叠 -->
+    <div class="panel span-2" style="min-height:400px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-green"></span>功能特性热力图矩阵</span><span style="font-size:0.7rem;color:#94a3b8;">✅有 / ❌无</span></div>
+        <div class="chart-wrap" id="chartHeatmap" style="height:360px;"></div>
+    </div>
+    <div class="panel" style="min-height:400px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-orange"></span>入站(Inbound)类型覆盖</span><span style="font-size:0.7rem;color:#94a3b8;">堆叠柱状图</span></div>
+        <div class="chart-wrap" id="chartInbound" style="height:350px;"></div>
+    </div>
+
+    <!-- ========= 替换后四个图表 ========= -->
+    <!-- 第4行：综合评分排名条形图 + 配置维度贡献堆叠图 -->
+    <div class="panel span-2" style="min-height:420px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-gold"></span>综合评分排名（满分💯）</span><span style="font-size:0.7rem;color:#94a3b8;">降序排列</span></div>
+        <div class="chart-wrap" id="chartRankBar" style="height:370px;"></div>
+    </div>
+    <div class="panel" style="min-height:420px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-purple"></span>配置维度贡献分解</span><span style="font-size:0.7rem;color:#94a3b8;">堆叠绝对值</span></div>
+        <div class="chart-wrap" id="chartStackContrib" style="height:370px;"></div>
+    </div>
+
+    <!-- 第5行：皮卡皮卡专属仪表盘 + 功能特性覆盖率环形图 -->
+    <div class="panel user-highlight span-2" style="min-height:380px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-gold"></span>您的综合实力仪表盘</span><span style="font-size:0.7rem;color:#94a3b8;">皮卡皮卡配置得分</span></div>
+        <div class="chart-wrap" id="chartGauge" style="height:330px;"></div>
+    </div>
+    <div class="panel" style="min-height:380px;">
+        <div class="panel-header"><span class="panel-title"><span class="dot dot-cyan"></span>功能特性覆盖率</span><span style="font-size:0.7rem;color:#94a3b8;">各特性被多少配置采用</span></div>
+        <div class="chart-wrap" id="chartFeatureCover" style="height:330px;"></div>
+    </div>
+
+    <!-- 第6行：满分排行榜表格 -->
+    <div class="panel full-width" style="padding:16px 18px;">
+        <div class="panel-header">
+            <span class="panel-title"><span class="dot dot-gold"></span>🏆 综合评分排行榜（满分💯）</span>
+            <span style="font-size:0.75rem;color:#94a3b8;">按综合评分降序</span>
+        </div>
+        <table class="rank-table" id="rankTable">
+            <thead> <tr><th>排名</th><th>配置名称</th><th>综合评分</th><th>DNS(服/规)</th><th>路由规则</th><th>出站</th><th>规则集</th><th>入站</th></tr> </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="footer-note full-width">
+        📊 数据基于12套真实 Sing-Box JSON 配置 | 综合评分 = DNS×0.25 + 路由×0.3 + 出站×0.2 + 规则集×0.15 + 入站×0.1 |
+        您的「皮卡皮卡配置」在所有图表中以 <span style="color:#fbbf24;">★金色★</span> 高亮 | 数据更新：2026-04-28
+    </div>
+</div>
+
+<script>
+(function() {
+    const configNames = [
+        '摆烂配置', '大大配置', '皮卡皮卡配置(您)', '薛定谔のcat', 'Danny Luo',
+        'dazuixia', 'Lyona Harris', 'momo配置', 'Mr丶z', 'Samrtin Sinale',
+        'Switzerland', 'turbo配置'
+    ];
+    const configShort = [
+        '摆烂', '大大', '皮卡皮卡(您)', '薛定谔cat', 'DannyLuo',
+        'dazuixia', 'Lyona', 'momo', 'Mr丶z', 'Samrtin',
+        'Swiss', 'turbo'
+    ];
+
+    const USER_INDEX = 2; // 皮卡皮卡配置
+
+    // 各维度数据
+    const dnsServers = [9,10,8,7,6,4,9,4,4,4,6,4];
+    const dnsRules = [10,9,17,12,13,7,9,7,17,6,13,3];
+    const outbounds = [12,5,21,38,6,3,15,2,42,5,6,19];
+    const routeRules = [20,10,26,34,20,9,23,9,41,13,20,14];
+    const ruleSets = [17,10,36,44,24,6,18,6,38,7,24,17];
+    const inboundTypes = [2,2,2,3,2,2,2,2,5,3,2,2];
+
+    const featureData = {
+        'FakeIP':       [0,1,1,1,1,1,1,1,1,1,1,1],
+        'NTP时间同步':  [0,0,1,0,1,0,0,0,0,0,1,0],
+        'Providers订阅':[0,1,0,1,0,0,1,0,1,1,0,0],
+        'http_clients': [0,0,1,0,1,0,0,0,1,0,1,0],
+        'Clash API':    [1,1,1,1,1,1,1,1,1,1,1,1],
+        'Cache File':   [1,1,1,1,1,1,1,1,1,1,1,1],
+        'store_dns':    [0,1,1,0,1,0,0,1,1,1,1,0],
+        'store_fakeip': [0,1,1,1,1,1,1,1,1,1,1,1],
+        'reverse_mapping':[0,0,1,1,1,1,0,0,1,0,1,0],
+        'optimistic DNS':[0,0,1,0,1,1,0,0,1,1,1,0]
+    };
+    const featureNames = Object.keys(featureData);
+
+    const inboundDetails = {
+        'tun':      [1,1,1,1,1,1,1,1,1,0,1,1],
+        'mixed':    [1,1,1,1,1,1,1,1,1,1,1,1],
+        'tproxy':   [0,0,0,1,0,0,0,0,1,1,0,0],
+        'redirect': [0,0,0,0,0,0,0,0,1,1,0,0],
+        'dns-in':   [0,0,0,0,0,0,0,0,1,0,0,0],
+    };
+
+    // 综合评分计算
+    function calcScore(i) {
+        const dnsPart = (dnsServers[i]/10)*0.25 + (dnsRules[i]/17)*0.25;
+        const routePart = (routeRules[i]/42)*0.3;
+        const outPart = (outbounds[i]/42)*0.2;
+        const setPart = (ruleSets[i]/44)*0.15;
+        const inPart = (inboundTypes[i]/5)*0.1;
+        return Math.round((dnsPart+routePart+outPart+setPart+inPart)*100);
+    }
+    const scores = configNames.map((_,i) => calcScore(i));
+
+    const userColor = '#f59e0b';
+    const userBright = '#fbbf24';
+    const otherColors = ['#3b82f6','#10b981','#8b5cf6','#06b6d4','#f97316','#ec4899','#6366f1','#14b8a6','#e11d48','#a855f7','#0ea5e9'];
+
+    function getColor(i) { return i===USER_INDEX ? userBright : otherColors[Math.min(i, otherColors.length-1)]; }
+
+    function initChart(domId) {
+        const dom = document.getElementById(domId);
+        if(!dom) return null;
+        const c = echarts.init(dom);
+        c.setOption({ backgroundColor:'transparent' });
+        return c;
+    }
+
+    // 更新统计卡片
+    document.getElementById('statUserRank').textContent = '#' + (scores.slice().sort((a,b)=>b-a).indexOf(scores[USER_INDEX])+1);
+    document.getElementById('statMaxDNS').textContent = Math.max(...dnsServers)+'个';
+    document.getElementById('statMaxRoutes').textContent = Math.max(...routeRules)+'条';
+    document.getElementById('statMaxOutbounds').textContent = Math.max(...outbounds)+'个';
+    document.getElementById('statMaxRuleSets').textContent = Math.max(...ruleSets)+'个';
+
+    // ---- 原有六个图表 ----
+    // 雷达图
+    (function(){
+        const c = initChart('chartRadar'); if(!c) return;
+        const indicator = [
+            { name:'DNS深度', max:30 },{ name:'路由规则', max:50 },{ name:'出站数量', max:50 },
+            { name:'规则集', max:50 },{ name:'入站覆盖', max:6 },{ name:'特性丰富度', max:10 }
+        ];
+        const series = configNames.map((name,i)=>{
+            const featCnt = featureNames.reduce((s,fn)=>s+(featureData[fn][i]||0),0);
+            return {
+                name, type:'radar',
+                symbol: i===USER_INDEX?'diamond':'circle', symbolSize: i===USER_INDEX?8:4,
+                lineStyle:{ width:i===USER_INDEX?3.5:1.5, color:getColor(i), shadowBlur:i===USER_INDEX?12:0, shadowColor:i===USER_INDEX?userColor:'transparent' },
+                areaStyle:{ opacity:i===USER_INDEX?0.25:0.04, color:getColor(i) },
+                itemStyle:{ color:getColor(i), borderColor:getColor(i), borderWidth:i===USER_INDEX?2:0 },
+                data:[{ value:[dnsServers[i]+dnsRules[i], routeRules[i], outbounds[i], ruleSets[i], inboundTypes[i], featCnt], name }],
+                emphasis:{ lineStyle:{width:4}, areaStyle:{opacity:0.35} }
+            };
         });
-
-        // ============ 图表2：DNS服务器分布 ============
-        new Chart(document.getElementById('chartDnsServers'), {
-            type: 'bar',
-            data: {
-                labels: ['local', 'hosts', 'DoT(TLS)', 'DoH(HTTPS)', 'DoQ(QUIC)', 'fakeip', 'H3(HTTP/3)'],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [1, 1, 1, 1, 1, 1, 0],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [1, 1, 0, 0, 2, 1, 1],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 10 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 1, precision: 0 },
-                        beginAtZero: true, max: 3, title: { display: true, text: '数量', color: '#8b949e' } }
-                }
-            }
+        c.setOption({
+            tooltip:{ trigger:'item', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'} },
+            legend:{ type:'scroll', bottom:0, textStyle:{color:'#94a3b8',fontSize:10}, data:configNames.map(n=>({name:n, textStyle:{color:n===configNames[USER_INDEX]?'#fbbf24':'#94a3b8'}})) },
+            radar:{ center:['50%','48%'], radius:'62%', indicator, axisName:{color:'#94a3b8',fontSize:10}, splitArea:{areaStyle:{color:['rgba(30,41,59,0.3)','rgba(30,41,59,0.6)']}}, splitLine:{lineStyle:{color:'#1e293b'}}, axisLine:{lineStyle:{color:'#334155'}} },
+            series
         });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
 
-        // ============ 图表3：DNS缓存容量 & 日志级别 ============
-        new Chart(document.getElementById('chartCacheLog'), {
-            type: 'bar',
-            data: {
-                labels: ['DNS缓存容量\n(相对值÷1000)', '日志级别\n(trace=5,warn=2)', 'NTP间隔\n(分钟)'],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [65.536, 5, 30],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [8.192, 2, 30],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 9 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9' }, beginAtZero: true,
-                        title: { display: true, text: '数值', color: '#8b949e' } }
-                }
-            }
+    // DNS柱状图
+    (function(){
+        const c = initChart('chartDNSBar'); if(!c) return;
+        c.setOption({
+            tooltip:{ trigger:'axis', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'} },
+            legend:{ data:['DNS服务器数','DNS规则数'], textStyle:{color:'#94a3b8',fontSize:10}, top:0 },
+            grid:{ left:'8%', right:'4%', top:'14%', bottom:'8%' },
+            xAxis:{ type:'category', data:configShort, axisLabel:{rotate:40,fontSize:9,color:'#94a3b8'}, axisLine:{lineStyle:{color:'#334155'}}, axisTick:{show:false} },
+            yAxis:{ type:'value', splitLine:{lineStyle:{color:'#1e293b',type:'dashed'}}, axisLabel:{fontSize:9,color:'#94a3b8'} },
+            series:[
+                { name:'DNS服务器数', type:'bar', data:dnsServers, itemStyle:{color:'#3b82f6',borderRadius:[6,6,0,0]}, barWidth:'35%' },
+                { name:'DNS规则数', type:'bar', data:dnsRules, itemStyle:{color:'#10b981',borderRadius:[6,6,0,0]}, barWidth:'35%' }
+            ]
         });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
 
-        // ============ 图表4：路由规则分类 ============
-        new Chart(document.getElementById('chartRouteRules'), {
-            type: 'bar',
-            data: {
-                labels: ['reject/drop', 'outbound DIRECT', 'outbound PROXY', 'hijack-dns', 'sniff', 'resolve',
-                    'route-options', '其他'
-                ],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [10, 8, 6, 1, 1, 1, 1, 1],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [8, 7, 5, 1, 1, 1, 1, 0],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 9 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 2, precision: 0 },
-                        beginAtZero: true, title: { display: true, text: '规则条数', color: '#8b949e' } }
-                }
-            }
+    // 路由规则&规则集
+    (function(){
+        const c = initChart('chartRouteRuleSet'); if(!c) return;
+        c.setOption({
+            tooltip:{ trigger:'axis', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'} },
+            legend:{ data:['路由规则数','规则集数量'], textStyle:{color:'#94a3b8',fontSize:10}, top:0 },
+            grid:{ left:'8%', right:'4%', top:'14%', bottom:'10%' },
+            xAxis:{ type:'category', data:configShort, axisLabel:{rotate:40,fontSize:9,color:'#94a3b8'} },
+            yAxis:{ type:'value', splitLine:{lineStyle:{color:'#1e293b',type:'dashed'}} },
+            series:[
+                { name:'路由规则数', type:'bar', data:routeRules, itemStyle:{color:'#8b5cf6',borderRadius:[6,6,0,0]}, barWidth:'35%' },
+                { name:'规则集数量', type:'bar', data:ruleSets, itemStyle:{color:'#f97316',borderRadius:[6,6,0,0]}, barWidth:'35%' }
+            ]
         });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
 
-        // ============ 图表5：规则集来源分布 ============
-        new Chart(document.getElementById('chartRuleSetSources'), {
-            type: 'bar',
-            data: {
-                labels: ['DustinWin', 'SagerNet', 'MetaCubeX', 'senshinya', 'hwsaya', '217heidai'],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [13, 5, 6, 6, 1, 1],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [3, 10, 7, 5, 0, 0],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 9 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 3, precision: 0 },
-                        beginAtZero: true, title: { display: true, text: '规则集数量', color: '#8b949e' } }
-                }
-            }
+    // 出站横向
+    (function(){
+        const c = initChart('chartOutboundBar'); if(!c) return;
+        const sorted = configNames.map((n,i)=>({name:configShort[i],value:outbounds[i],idx:i})).sort((a,b)=>b.value-a.value);
+        c.setOption({
+            tooltip:{ trigger:'axis', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'} },
+            grid:{ left:'2%', right:'8%', top:'2%', bottom:'2%', containLabel:true },
+            xAxis:{ type:'value', splitLine:{lineStyle:{color:'#1e293b',type:'dashed'}} },
+            yAxis:{ type:'category', data:sorted.map(d=>d.name), axisLabel:{fontSize:10,color:'#c8d6e5'}, inverse:true },
+            series:[{
+                type:'bar', data:sorted.map(d=>({value:d.value, itemStyle:{color:d.idx===USER_INDEX?userBright:'#06b6d4',borderRadius:[0,8,8,0],shadowBlur:d.idx===USER_INDEX?14:0,shadowColor:d.idx===USER_INDEX?userColor:'transparent'}})),
+                barWidth:'55%', label:{show:true,position:'right',fontSize:10,color:'#c8d6e5',formatter:'{c}个'}
+            }]
         });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
 
-        // ============ 图表6：入站特性 ============
-        new Chart(document.getElementById('chartInbound'), {
-            type: 'bar',
-            data: {
-                labels: ['strict\n_route', 'endpoint\n_independent\n_nat', 'route\n_exclude\n_address_set',
-                    'platform\n_http_proxy', 'override\n_android\n_vpn', 'gvisor\n_stack', 'mixed\n_stack',
-                    'IPv6\n_TUN', 'auto\n_redirect'
-                ],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [1, 0, 0, 0, 0, 0, 1, 0, 0],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [0, 1, 1, 1, 1, 1, 0, 1, 1],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 8 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 1, precision: 0, max: 2 },
-                        beginAtZero: true, title: { display: true, text: '支持(1=是)', color: '#8b949e' } }
-                }
-            }
+    // 热力图
+    (function(){
+        const c = initChart('chartHeatmap'); if(!c) return;
+        const data = [];
+        featureNames.forEach((fn,fi)=>{ configNames.forEach((_,ci)=>{ data.push([fi,ci,featureData[fn][ci]||0]); }); });
+        c.setOption({
+            tooltip:{ trigger:'item', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'}, formatter:p=>configShort[p.value[1]]+'<br/>'+featureNames[p.value[0]]+'：<b>'+(p.value[2]===1?'✅ 是':'❌ 否')+'</b>' },
+            grid:{ left:'18%', right:'5%', top:'2%', bottom:'10%' },
+            xAxis:{ type:'category', data:configShort, axisLabel:{rotate:45,fontSize:9,color:'#94a3b8'}, position:'bottom' },
+            yAxis:{ type:'category', data:featureNames, axisLabel:{fontSize:9,color:'#c8d6e5'} },
+            visualMap:{ min:0, max:1, show:false, inRange:{color:['#1e293b','#10b981']} },
+            series:[{ type:'heatmap', data, label:{show:true,fontSize:13,color:'#c8d6e5',formatter:p=>p.value[2]===1?'✅':'·'}, emphasis:{itemStyle:{shadowBlur:10}}, itemStyle:{borderColor:'#0a0e17',borderWidth:2,borderRadius:3} }]
         });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
 
-        // ============ 图表7：出站策略 ============
-        new Chart(document.getElementById('chartOutbound'), {
-            type: 'bar',
-            data: {
-                labels: ['selector\n策略组', 'urltest\n自动测速', 'CN独立\n策略组', 'GLOBAL\n策略组', 'reality\n协议',
-                    'xtls-flow', 'ws传输', 'tcp_fast\n_open'
-                ],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [3, 1, 1, 1, 0, 0, 1, 1],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [3, 0, 0, 0, 1, 1, 0, 1],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 8 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 1, precision: 0, max: 4 },
-                        beginAtZero: true, title: { display: true, text: '数量/支持', color: '#8b949e' } }
-                }
-            }
+    // 入站堆叠
+    (function(){
+        const c = initChart('chartInbound'); if(!c) return;
+        const types = Object.keys(inboundDetails);
+        const colorMap = {tun:'#3b82f6',mixed:'#10b981',tproxy:'#f97316',redirect:'#8b5cf6','dns-in':'#ec4899'};
+        const series = types.map(tn=>({ name:tn, type:'bar', stack:'total', data:inboundDetails[tn], itemStyle:{color:colorMap[tn],borderRadius:tn==='dns-in'?[6,6,0,0]:2} }));
+        c.setOption({
+            tooltip:{ trigger:'axis', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'}, axisPointer:{type:'shadow'} },
+            legend:{ data:types, textStyle:{color:'#94a3b8',fontSize:9}, top:0 },
+            grid:{ left:'6%', right:'4%', top:'14%', bottom:'8%' },
+            xAxis:{ type:'category', data:configShort, axisLabel:{rotate:40,fontSize:9,color:'#94a3b8'} },
+            yAxis:{ type:'value', splitLine:{lineStyle:{color:'#1e293b',type:'dashed'}}, max:6 },
+            series
         });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
 
-        // ============ 图表8：高级功能支持矩阵 ============
-        new Chart(document.getElementById('chartFeatures'), {
-            type: 'bar',
-            data: {
-                labels: ['optimistic\nDNS', 'sniff', 'utls', 'udp\n_fragment', 'prefer\n_ipv4', 'auto_detect\n_interface',
-                    'store\n_dns', 'store\n_fakeip', 'clash\n_api', 'reverse\n_mapping'
-                ],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 8 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 1, precision: 0, max: 2 },
-                        beginAtZero: true, title: { display: true, text: '支持(1=是)', color: '#8b949e' } }
-                }
-            }
+    // ---- 新增图表：综合评分排名条形图 ----
+    (function(){
+        const c = initChart('chartRankBar'); if(!c) return;
+        const sorted = configNames.map((n,i)=>({name:configShort[i],value:scores[i],idx:i})).sort((a,b)=>b.value-a.value);
+        c.setOption({
+            tooltip:{ trigger:'axis', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'} },
+            grid:{ left:'2%', right:'10%', top:'2%', bottom:'2%', containLabel:true },
+            xAxis:{ type:'value', max:100, splitLine:{lineStyle:{color:'#1e293b',type:'dashed'}} },
+            yAxis:{ type:'category', data:sorted.map(d=>d.name), axisLabel:{fontSize:10,color:'#c8d6e5'}, inverse:true },
+            series:[{
+                type:'bar', data:sorted.map(d=>({value:d.value, itemStyle:{color:d.idx===USER_INDEX?userBright:'#f59e0b',borderRadius:[0,6,6,0],shadowBlur:d.idx===USER_INDEX?10:0}})),
+                barWidth:'50%', label:{show:true,position:'right',fontSize:10,color:'#fff',formatter:'{c}分'}
+            }]
         });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
 
-        // ============ 图表9：DNS规则动作分布 ============
-        new Chart(document.getElementById('chartDnsActions'), {
-            type: 'bar',
-            data: {
-                labels: ['reject', 'predefined\n(NOERROR)', 'route\n(指定服务器)', 'evaluate', 'respond', 'route\n(local)'],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [2, 3, 7, 1, 1, 2],
-                    backgroundColor: userColorBg,
-                    borderColor: userColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [0, 3, 8, 1, 0, 2],
-                    backgroundColor: friendColorBg,
-                    borderColor: friendColorBorder,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 9 } } },
-                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 2, precision: 0 },
-                        beginAtZero: true, title: { display: true, text: '规则条数', color: '#8b949e' } }
-                }
-            }
+    // ---- 配置维度贡献堆叠图 ----
+    (function(){
+        const c = initChart('chartStackContrib'); if(!c) return;
+        // 计算各维度原始分数贡献（非归一化），用于堆叠展示
+        const dnsContrib = configNames.map((_,i)=>(dnsServers[i]/10*0.25 + dnsRules[i]/17*0.25)*100);
+        const routeContrib = configNames.map((_,i)=>(routeRules[i]/42*0.3)*100);
+        const outContrib = configNames.map((_,i)=>(outbounds[i]/42*0.2)*100);
+        const setContrib = configNames.map((_,i)=>(ruleSets[i]/44*0.15)*100);
+        const inContrib = configNames.map((_,i)=>(inboundTypes[i]/5*0.1)*100);
+        c.setOption({
+            tooltip:{ trigger:'axis', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'}, formatter: function(params) { return params.map(p=>p.seriesName+': '+p.value.toFixed(1)+'分').join('<br/>'); } },
+            legend:{ data:['DNS贡献','路由贡献','出站贡献','规则集贡献','入站贡献'], textStyle:{color:'#94a3b8',fontSize:9}, top:0 },
+            grid:{ left:'6%', right:'4%', top:'14%', bottom:'10%' },
+            xAxis:{ type:'category', data:configShort, axisLabel:{rotate:40,fontSize:9,color:'#94a3b8'} },
+            yAxis:{ type:'value', name:'分数', splitLine:{lineStyle:{color:'#1e293b',type:'dashed'}} },
+            series:[
+                { name:'DNS贡献', type:'bar', stack:'total', data:dnsContrib, itemStyle:{color:'#3b82f6'} },
+                { name:'路由贡献', type:'bar', stack:'total', data:routeContrib, itemStyle:{color:'#8b5cf6'} },
+                { name:'出站贡献', type:'bar', stack:'total', data:outContrib, itemStyle:{color:'#06b6d4'} },
+                { name:'规则集贡献', type:'bar', stack:'total', data:setContrib, itemStyle:{color:'#f97316'} },
+                { name:'入站贡献', type:'bar', stack:'total', data:inContrib, itemStyle:{color:'#10b981'} },
+            ]
         });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
 
-        // ============ 图表10：综合能力雷达图 ============
-        new Chart(document.getElementById('chartRadar'), {
-            type: 'radar',
-            data: {
-                labels: ['去广告能力', '隐私保护', '解析性能', '配置灵活性', '连接稳定性', '规则覆盖度', '分流精细化',
-                '扩展性'],
-                datasets: [{
-                    label: '皮卡皮卡配置',
-                    data: [88, 82, 90, 92, 78, 95, 85, 88],
-                    backgroundColor: 'rgba(88,166,255,0.15)',
-                    borderColor: userColor,
-                    borderWidth: 3,
-                    pointBackgroundColor: userColor,
-                    pointBorderColor: '#fff',
-                    pointRadius: 5,
-                    pointHoverRadius: 8,
-                }, {
-                    label: 'Danny Luo配置',
-                    data: [82, 88, 78, 80, 90, 80, 88, 82],
-                    backgroundColor: 'rgba(247,129,102,0.15)',
-                    borderColor: friendColor,
-                    borderWidth: 3,
-                    pointBackgroundColor: friendColor,
-                    pointBorderColor: '#fff',
-                    pointRadius: 5,
-                    pointHoverRadius: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
-                },
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: { color: '#8b949e', backdropColor: 'transparent', stepSize: 20, font: { size: 9 } },
-                        grid: { color: 'rgba(48,54,61,0.7)' },
-                        angleLines: { color: 'rgba(48,54,61,0.7)' },
-                        pointLabels: { color: '#c9d1d9', font: { size: 10, weight: '500' } },
-                    }
-                }
-            }
+    // ---- 仪表盘 ----
+    (function(){
+        const c = initChart('chartGauge'); if(!c) return;
+        const userScore = scores[USER_INDEX];
+        c.setOption({
+            tooltip:{ formatter:'皮卡皮卡配置<br/>综合评分：<b>'+userScore+'</b>分' },
+            series:[{
+                type:'gauge', startAngle:210, endAngle:-30, center:['50%','60%'], radius:'85%',
+                min:0, max:100, splitNumber:10,
+                axisLine:{ show:true, lineStyle:{ width:15, color:[[0.3,'#ef4444'],[0.6,'#f59e0b'],[1,'#10b981']] } },
+                pointer:{ icon:'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z', length:'75%', width:8, itemStyle:{color:'#fbbf24'} },
+                axisTick:{ distance:-15, length:6, lineStyle:{color:'#fff',width:1} },
+                splitLine:{ distance:-18, length:14, lineStyle:{color:'#fff',width:2} },
+                axisLabel:{ distance:25, color:'#94a3b8', fontSize:10 },
+                detail:{ valueAnimation:true, formatter:'{value}分', color:'#fbbf24', fontSize:18, offsetCenter:[0,'70%'] },
+                data:[{ value:userScore, name:'综合评分' }]
+            }]
         });
-    </script>
+        window.addEventListener('resize', ()=>c.resize());
+    })();
+
+    // ---- 功能特性覆盖率环形图 ----
+    (function(){
+        const c = initChart('chartFeatureCover'); if(!c) return;
+        const totalConfigs = configNames.length;
+        const data = featureNames.map(fn => ({
+            name: fn,
+            value: featureData[fn].reduce((a,b)=>a+b,0)
+        }));
+        c.setOption({
+            tooltip:{ trigger:'item', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'}, formatter:'{b}：{c} 个配置 (占比 {d}%)' },
+            legend:{ type:'scroll', orient:'vertical', right:5, top:'middle', textStyle:{color:'#94a3b8',fontSize:9} },
+            series:[{
+                type:'pie', radius:['45%','70%'], center:['40%','50%'],
+                data: data,
+                label:{ show:true, fontSize:9, color:'#c8d6e5', formatter:'{b} {c}个' },
+                emphasis:{ itemStyle:{ shadowBlur:10, scale:true } },
+                itemStyle:{ borderRadius:6, borderColor:'#0a0e17', borderWidth:2 }
+            }]
+        });
+        window.addEventListener('resize', ()=>c.resize());
+    })();
+
+    // ---- 排行榜表格 ----
+    (function(){
+        const ranked = configNames.map((n,i)=>({name:n, short:configShort[i], score:scores[i], servers:dnsServers[i], dnsR:dnsRules[i], route:routeRules[i], out:outbounds[i], set:ruleSets[i], in:inboundTypes[i]}))
+            .sort((a,b)=>b.score-a.score);
+        const tbody = document.querySelector('#rankTable tbody');
+        ranked.forEach((item, idx)=>{
+            const tr = document.createElement('tr');
+            if(item.name.includes('皮卡皮卡')) tr.classList.add('user-row');
+            tr.innerHTML = `
+                <td><span class="rank-badge ${idx===0?'gold':''}">${idx+1}</span></td>
+                <td>${item.short}</td>
+                <td class="score">${item.score}分</td>
+                <td>${item.servers}/${item.dnsR}</td>
+                <td>${item.route}条</td>
+                <td>${item.out}个</td>
+                <td>${item.set}个</td>
+                <td>${item.in}种</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    })();
+
+    console.log('✅ 新版大屏已加载，包含排行榜、仪表盘和替换后的四个图表。');
+})();
+</script>
 </body>
 </html>
