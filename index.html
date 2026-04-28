@@ -1,395 +1,1003 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>sing-box 配置全面对比 | 1.14.0-alpha.18 vs Switzerland</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      background: #f5f7fb;
-      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Noto Sans', 'Helvetica Neue', sans-serif;
-      padding: 2rem 1.5rem;
-      color: #1e293b;
-      line-height: 1.5;
-    }
-    .container {
-      max-width: 1300px;
-      margin: 0 auto;
-      background: #ffffff;
-      border-radius: 2rem;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
-      padding: 2.2rem 2rem;
-      transition: all 0.2s ease;
-    }
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.3rem;
-      color: #0f172a;
-      letter-spacing: -0.3px;
-    }
-    h1 small {
-      font-size: 1rem;
-      font-weight: 500;
-      background: #eef2ff;
-      color: #4338ca;
-      padding: 0.15rem 0.9rem;
-      border-radius: 2rem;
-      margin-left: 0.8rem;
-    }
-    .subtitle {
-      font-size: 1rem;
-      color: #475569;
-      margin-bottom: 2rem;
-      border-left: 4px solid #6366f1;
-      padding-left: 1rem;
-      background: #f8fafc;
-      border-radius: 0 0.8rem 0.8rem 0;
-      line-height: 1.6;
-    }
-    .comparison-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.8rem;
-      margin: 1.8rem 0 2.5rem;
-    }
-    .card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 1.5rem;
-      padding: 1.5rem 1.4rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-      transition: box-shadow 0.2s, border-color 0.2s;
-    }
-    .card:hover {
-      box-shadow: 0 10px 25px -8px rgba(0,0,0,0.08);
-      border-color: #cbd5e1;
-    }
-    .card h3 {
-      font-size: 1.3rem;
-      font-weight: 650;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-bottom: 1.2rem;
-      color: #1e293b;
-    }
-    .badge {
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 0.2rem 0.7rem;
-      border-radius: 2rem;
-      background: #f1f5f9;
-      color: #334155;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    .badge.primary {
-      background: #e0e7ff;
-      color: #3730a3;
-    }
-    .badge.warning {
-      background: #fff7ed;
-      color: #c2410c;
-    }
-    .badge.success {
-      background: #dcfce7;
-      color: #166534;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-      margin: 1.2rem 0 0.5rem;
-    }
-    th {
-      text-align: left;
-      padding: 0.7rem 0.5rem 0.7rem 0;
-      font-weight: 600;
-      color: #475569;
-      border-bottom: 1px solid #e2e8f0;
-      width: 35%;
-    }
-    td {
-      padding: 0.7rem 0.5rem 0.7rem 0;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: top;
-      color: #1e293b;
-    }
-    tr:last-child td, tr:last-child th {
-      border-bottom: none;
-    }
-    .highlight {
-      background: #fef9c3;
-      font-weight: 500;
-      padding: 0 0.2rem;
-      border-radius: 0.3rem;
-    }
-    .score-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-top: 1.5rem;
-    }
-    .score {
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1;
-    }
-    .verdict-box {
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-      border: 1px solid #bae6fd;
-      border-radius: 1.5rem;
-      padding: 1.5rem 1.8rem;
-      margin: 2rem 0 1.2rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .verdict-text {
-      font-size: 1.15rem;
-      font-weight: 500;
-    }
-    .winner {
-      font-weight: 700;
-      font-size: 1.4rem;
-      background: #0f172a;
-      color: white;
-      padding: 0.3rem 1.2rem;
-      border-radius: 2.5rem;
-    }
-    .pros-cons {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-      margin: 1.8rem 0 1rem;
-    }
-    .pros, .cons {
-      flex: 1;
-      min-width: 200px;
-    }
-    .pros h4, .cons h4 {
-      font-size: 1rem;
-      font-weight: 650;
-      margin-bottom: 0.6rem;
-    }
-    ul {
-      padding-left: 1.4rem;
-    }
-    li {
-      margin-bottom: 0.4rem;
-    }
-    hr {
-      border: none;
-      border-top: 1px solid #e2e8f0;
-      margin: 1.8rem 0 1rem;
-    }
-    .footer-note {
-      color: #64748b;
-      font-size: 0.85rem;
-      margin-top: 1rem;
-      text-align: right;
-    }
-    @media (max-width: 700px) {
-      .comparison-grid {
-        grid-template-columns: 1fr;
-      }
-      body {
-        padding: 1rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sing-Box 配置全面对比分析 - 1.14.0-alpha.18 vs Switzerland</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
+    </script>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent1: #58a6ff;
+            --accent2: #f78166;
+            --accent3: #3fb950;
+            --accent4: #d2a8ff;
+            --accent5: #f0c929;
+            --accent6: #ff7b72;
+            --accent7: #79c0ff;
+            --accent8: #a5d6ff;
+            --gradient-user: linear-gradient(135deg, #58a6ff, #3fb950);
+            --gradient-friend: linear-gradient(135deg, #f78166, #d2a8ff);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 32px 20px 24px;
+            position: relative;
+        }
+        header h1 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #58a6ff, #d2a8ff, #f78166);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+        header .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+        }
+
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin: 8px 0 16px;
+            font-size: 0.85rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .legend-dot.user {
+            background: var(--gradient-user);
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+        }
+        .legend-dot.friend {
+            background: var(--gradient-friend);
+            box-shadow: 0 0 10px rgba(247, 129, 102, 0.5);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .grid-full {
+            grid-column: 1 / -1;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 18px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        .card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card h3 .icon {
+            font-size: 1.3rem;
+        }
+        .card .desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .card .chart-wrap {
+            position: relative;
+            width: 100%;
+            height: 280px;
+        }
+        .card .chart-wrap.tall {
+            height: 330px;
+        }
+        .card .chart-wrap.short {
+            height: 220px;
+        }
+        .card .chart-wrap.xshort {
+            height: 180px;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .highlight-box {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .highlight-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.73rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+        .tag-user {
+            background: rgba(88, 166, 255, 0.18);
+            color: #58a6ff;
+            border: 1px solid rgba(88, 166, 255, 0.35);
+        }
+        .tag-friend {
+            background: rgba(247, 129, 102, 0.18);
+            color: #f78166;
+            border: 1px solid rgba(247, 129, 102, 0.35);
+        }
+        .tag-both {
+            background: rgba(210, 168, 255, 0.18);
+            color: #d2a8ff;
+            border: 1px solid rgba(210, 168, 255, 0.35);
+        }
+        .tag-neutral {
+            background: rgba(139, 148, 158, 0.15);
+            color: #8b949e;
+            border: 1px solid rgba(139, 148, 158, 0.3);
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            margin-top: 8px;
+        }
+        .summary-table th,
+        .summary-table td {
+            padding: 8px 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .summary-table th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .summary-table .val-user {
+            color: #58a6ff;
+            font-weight: 600;
+        }
+        .summary-table .val-friend {
+            color: #f78166;
+            font-weight: 600;
+        }
+        .summary-table .val-equal {
+            color: #8b949e;
+        }
+
+        .winner-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+        .winner-user {
+            background: rgba(88, 166, 255, 0.2);
+            color: #58a6ff;
+        }
+        .winner-friend {
+            background: rgba(247, 129, 102, 0.2);
+            color: #f78166;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            letter-spacing: 0.03em;
+        }
+
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .card .chart-wrap {
+                height: 230px;
+            }
+            .card .chart-wrap.tall {
+                height: 260px;
+            }
+            header h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <h1>
-    ⚖️ sing-box 配置深度对比
-    <small>1.14.0-alpha.18 vs Switzerland</small>
-  </h1>
-  <div class="subtitle">
-    <strong>左：用户当前配置 (1.14.0-alpha.18.json)</strong> · 多节点、均衡策略<br>
-    <strong>右：群友 Danny Luo 配置 (Switzerland.json)</strong> · 单节点、极度精细规则
-  </div>
 
-  <!-- 快速概览卡片 -->
-  <div class="comparison-grid">
-    <div class="card">
-      <h3><span class="badge primary">用户配置</span> 1.14.0-alpha.18</h3>
-      <table>
-        <tr><th>DNS 服务器</th><td>本地、hosts_fix、alidns-dot、alidns-quic、ggdns (DoH)、fakeip</td></tr>
-        <tr><th>DNS 策略</th><td>国内直连 + 指定域名 fakeip / 最终 Google DNS</td></tr>
-        <tr><th>路由规则数</th><td>~22 条 (含 sniff, hijack-dns, 规则集, 私有 IP)</td></tr>
-        <tr><th>出站节点</th><td><strong>14 个 VLESS 节点</strong> + urltest 自动测速</td></tr>
-        <tr><th>Final 兜底</th><td><span class="highlight">PROXY</span> (默认代理)</td></tr>
-        <tr><th>实验性</th><td>Clash API, 缓存, gc_percent=50, 内存限制 200MB</td></tr>
-        <tr><th>风格</th><td>通用型、防污染、多节点容错</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <h3><span class="badge warning">群友配置</span> Switzerland</h3>
-      <table>
-        <tr><th>DNS 服务器</th><td>direct_dns (QUIC), proxy_dns (QUIC), dns.google (H3), local, fakeip, hosts (更多预定义)</td></tr>
-        <tr><th>DNS 策略</th><td>规则集驱动：Filter/Ads/ChinaMax/Google 精确分流，fakeip 过滤增强</td></tr>
-        <tr><th>路由规则数</th><td><strong>~28 条</strong> (含 sniff, route-options, 大量 reject, 协议阻断, IPv6 控制)</td></tr>
-        <tr><th>出站节点</th><td><strong>仅 1 个 Reality 节点</strong> (Switzerland)</td></tr>
-        <tr><th>Final 兜底</th><td><span class="highlight" style="background:#fee2e2;">REJECT-DROP</span> (默认拒绝)</td></tr>
-        <tr><th>实验性</th><td>Clash API, 缓存, gc_percent=200, 内存限制 1024MB</td></tr>
-        <tr><th>风格</th><td>极客型、高隐私、严格流控</td></tr>
-      </table>
-    </div>
-  </div>
+    <div class="container">
+        <header>
+            <h1>🔍 Sing-Box 配置全面对比分析</h1>
+            <p class="subtitle">1.14.0-alpha.18（皮卡皮卡配置） vs Switzerland（Danny Luo配置） · 全方位模块级对比</p>
+            <div class="legend-row">
+                <span class="legend-item"><span class="legend-dot user"></span> 皮卡皮卡配置 (alpha.18)</span>
+                <span class="legend-item"><span class="legend-dot friend"></span> Danny Luo配置 (Switzerland)</span>
+            </div>
+        </header>
 
-  <!-- 详细对比表格 -->
-  <h2 style="margin-top: 2rem; font-weight: 650;">📊 逐项技术对比</h2>
-  <div style="overflow-x: auto;">
-    <table style="min-width: 700px; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 0.5rem;">
-      <thead>
-        <tr style="background: #f8fafc;">
-          <th style="width: 20%;">维度</th>
-          <th style="width: 40%;">用户 (1.14.0-alpha.18)</th>
-          <th style="width: 40%;">群友 (Switzerland)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>DNS 完整度</strong></td>
-          <td>✅ 基础但实用：国内走阿里 QUIC/DoT，国外走 Google DoH + fakeip。hosts 固定部分关键域名。</td>
-          <td>🏆 <strong>更全面</strong>：国内走阿里 QUIC，国外走 AdGuard QUIC + Google H3，引入 fakeip-filter 规则集，DNS 层面去广告/防跟踪，且 hosts 预定义更丰富。</td>
-        </tr>
-        <tr>
-          <td><strong>DNS 分流逻辑</strong></td>
-          <td>按域名后缀分流，fakeip 用于代理列表和游戏/AI。cn 域名走国内 DNS。</td>
-          <td>规则集驱动：private/Filter/ChinaMax/Apple 等走国内，Proxy/gfw/Google 等走 fakeip，并含有 evaluate 和 geoip 响应路由，更精细。</td>
-        </tr>
-        <tr>
-          <td><strong>路由 sniff 嗅探</strong></td>
-          <td>全局 sniff (两条 sniff 规则，第二条有效)。</td>
-          <td>sniff 置于顶部，但排除了 Mijia Cloud 和 push.apple.com，并 invert 了 telegram_ip，更精准地避免误嗅探。</td>
-        </tr>
-        <tr>
-          <td><strong>hijack-dns 位置</strong></td>
-          <td>在私有 IP 直连之前，正确劫持 DNS 查询。</td>
-          <td>在 sniff 之后、大量拒绝规则之前，位置合理。</td>
-        </tr>
-        <tr>
-          <td><strong>协议与端口过滤</strong></td>
-          <td>阻断 QUIC 443（强制 TCP），阻断 STUN/WebRTC 相关端口。</td>
-          <td>🏆 <strong>更激进</strong>：阻断 STUN/QUIC/DTLS 协议，额外屏蔽腾讯灯塔、彩云等跟踪域名，并丢弃 IPv6 非全球单播地址。</td>
-        </tr>
-        <tr>
-          <td><strong>规则集丰富度</strong></td>
-          <td>使用 geosite 和自定义规则集：proxy, games, ai, cn, private, telegramip, cnip 等，基本覆盖。</td>
-          <td>🏆 <strong>更多样</strong>：除常见规则集外，还有 Applications, OnePlus, Android, fcm, GlobalMedia, httpDNS, DNSreject, Ads, adobe 等，针对性更强。</td>
-        </tr>
-        <tr>
-          <td><strong>出站容错能力</strong></td>
-          <td>🏆 <strong>极强</strong>：14 个 VLESS 节点，urltest 自动选择最优，selector 可手动切换，PROXY 组内含 DIRECT 降级。</td>
-          <td>⚠️ 单节点：仅一个 Reality 节点。若节点失效，全局断流（除非手动切换 Final 到 direct，但默认 REJECT）。</td>
-        </tr>
-        <tr>
-          <td><strong>Final 策略</strong></td>
-          <td>默认 <strong>PROXY</strong>：未匹配流量走代理，安全且不易漏网。</td>
-          <td>默认 <strong>REJECT-DROP</strong>：未匹配流量直接丢弃。虽隐私保护强，但容易误伤小众国外服务（需频繁维护规则）。</td>
-        </tr>
-        <tr>
-          <td><strong>内存与 GC 调优</strong></td>
-          <td>gc_percent=50，内存限制 200MB。较保守，低内存设备友好。</td>
-          <td>gc_percent=200，内存限制 1024MB。允许更高内存占用，但 GC 触发较晚，错误规则下可能 OOM。</td>
-        </tr>
-        <tr>
-          <td><strong>实验性功能</strong></td>
-          <td>Clash API + cache_file (store_fakeip/dns)。</td>
-          <td>同样具备，同时 tun 栈使用 gvisor，支持 endpoint_independent_nat，并配置了 http_proxy 回环。</td>
-        </tr>
-        <tr>
-          <td><strong>IPv6 处理</strong></td>
-          <td>未显式处理 IPv6 路由。</td>
-          <td>🏆 明确拒绝非全球单播 IPv6 地址，并配置了 fakeip 的 IPv6 范围 fc00::/18。</td>
-        </tr>
-        <tr>
-          <td><strong>隐私与抗追踪</strong></td>
-          <td>有广告规则集拦截。</td>
-          <td>🏆 <strong>多维度</strong>：DNS 广告过滤、路由直接 drop 跟踪域名、httpDNS 规则集、伪造 NOERROR 响应等。</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+        <!-- ==================== 第一行：规模总览 ==================== -->
+        <div class="grid-3">
+            <!-- 卡片1：配置规模总览 -->
+            <div class="card">
+                <h3><span class="icon">📊</span>配置规模总览</h3>
+                <p class="desc">DNS服务器·规则·路由规则·规则集·出/入站数量对比</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartScale"></canvas>
+                </div>
+                <div class="highlight-box">
+                    <span class="highlight-tag tag-user">皮卡皮卡规则集+9个</span>
+                    <span class="highlight-tag tag-user">DNS规则+2条</span>
+                    <span class="highlight-tag tag-friend">入站参数更丰富</span>
+                </div>
+            </div>
 
-  <!-- 综合评判 -->
-  <div class="verdict-box">
-    <div>
-      <div class="verdict-text" style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem;">🏅 综合实力判定</div>
-      <div style="color: #334155;">技术全面性 & 规则精细度：<span class="winner" style="background:#b45309;">Switzerland 胜出</span><br>
-      可用性 & 容错 & 日常稳定性：<span class="winner" style="background:#166534;">1.14.0-alpha.18 胜出</span></div>
-    </div>
-    <div style="font-size: 2.5rem; font-weight: 800; color: #0f172a;">⚔️</div>
-  </div>
+            <!-- 卡片2：DNS专项对比 -->
+            <div class="card">
+                <h3><span class="icon">🌐</span>DNS服务器分布</h3>
+                <p class="desc">各类型DNS服务器数量：local / hosts / DoT / DoH / DoQ / fakeip / H3</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartDnsServers"></canvas>
+                </div>
+                <div class="highlight-box">
+                    <span class="highlight-tag tag-user">你有DoT(alidns-dot)</span>
+                    <span class="highlight-tag tag-friend">Danny Luo有H3(dns.google)</span>
+                    <span class="highlight-tag tag-both">均有fakeip+hosts</span>
+                </div>
+            </div>
 
-  <div class="pros-cons">
-    <div class="pros">
-      <h4>✅ 群友 Danny Luo 配置亮点</h4>
-      <ul>
-        <li>DNS 与路由规则如同“瑞士军刀”，覆盖隐私、去广告、协议阻断、IPv6 控制。</li>
-        <li>fakeip-filter 与 DNS 规则集联动，降低了假 IP 污染。</li>
-        <li>主动丢弃未知流量（REJECT-DROP），适合对安全要求偏执的场景。</li>
-        <li>整体结构清晰，适合单节点极致优化。</li>
-      </ul>
-    </div>
-    <div class="cons">
-      <h4>⚠️ 潜在短板</h4>
-      <ul>
-        <li><strong>单节点风险极大</strong>，无自动故障转移。</li>
-        <li>Final 为 REJECT-DROP 需要使用者非常了解规则集覆盖范围，否则正常网站被断流。</li>
-        <li>内存限制较高，错误配置时曾导致手机过热 (bypass 风暴)。</li>
-        <li>部分 DNS 服务器（AdGuard QUIC）可能在国内被干扰，导致解析延迟。</li>
-      </ul>
-    </div>
-  </div>
+            <!-- 卡片3：DNS缓存与性能 -->
+            <div class="card">
+                <h3><span class="icon">⚡</span>DNS缓存容量 & 日志级别</h3>
+                <p class="desc">cache_capacity对比（皮卡皮卡65536 vs Danny Luo8192）· 日志级别量化</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartCacheLog"></canvas>
+                </div>
+                <div class="highlight-box">
+                    <span class="highlight-tag tag-user">缓存容量8倍于Danny Luo</span>
+                    <span class="highlight-tag tag-user">日志trace级更详细</span>
+                    <span class="highlight-tag tag-friend">Danny Luowarn级更安静</span>
+                </div>
+            </div>
+        </div>
 
-  <div class="pros-cons">
-    <div class="pros">
-      <h4>✅ 用户配置 (1.14.0-alpha.18) 亮点</h4>
-      <ul>
-        <li>14 个节点 + urltest 自动选择，高可用且延迟最优。</li>
-        <li>Final 默认 proxy，避免“误杀”小众网站。</li>
-        <li>内存占用控制优秀，适合手机长期运行。</li>
-        <li>规则简洁但够用，维护成本低。</li>
-      </ul>
-    </div>
-    <div class="cons">
-      <h4>⚠️ 可提升之处</h4>
-      <ul>
-        <li>DNS 没有引入广告过滤/跟踪器屏蔽。</li>
-        <li>缺少对 STUN/DTLS 等协议的系统性阻断（目前仅端口屏蔽）。</li>
-        <li>IPv6 路由未显式控制，在纯 IPv6 环境下可能出现泄漏。</li>
-        <li>fakeip 规则较简单，未使用 filter 规则集。</li>
-      </ul>
-    </div>
-  </div>
+        <!-- ==================== 第二行：路由&规则集 ==================== -->
+        <div class="grid">
+            <!-- 卡片4：路由规则分类对比 -->
+            <div class="card">
+                <h3><span class="icon">🗺️</span>路由规则分类对比</h3>
+                <p class="desc">按动作类型统计：reject/drop · outbound直连 · outbound代理 · hijack-dns · 其他</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartRouteRules"></canvas>
+                </div>
+            </div>
 
-  <hr>
-  <div style="background: #f1f5f9; border-radius: 1.2rem; padding: 1.2rem 1.5rem;">
-    <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">📌 结论：谁更强？</p>
-    <p style="margin-bottom: 0.8rem;">
-      <strong>如果比拼“规则工程的精细度与安全防护的全面性”</strong> —— <span style="background: #fed7aa; padding:0.1rem 0.6rem; border-radius: 0.4rem;">Danny Luo 的 Switzerland 配置更强</span>，它几乎把 sing-box 的路由、DNS 能力压榨到了极致，堪称“规则教科书”。<br>
-      <strong>如果比拼“日常使用可靠性、多节点容错与省心程度”</strong> —— <span style="background: #bbf7d0; padding:0.1rem 0.6rem; border-radius: 0.4rem;">你的 1.14.0-alpha.18 配置更强</span>，更适应国内网络波动，且不易因规则遗漏而断网。
-    </p>
-    <p>
-      💡 <em>两者并非绝对优劣，而是设计哲学不同：一个追求极致控制与隐私（瑞士军刀），一个追求稳定与高可用（均衡舰队）。若能将 Switzerland 的 DNS/路由规则与你的多节点出站结合，便是真正的“完全体”。</em>
-    </p>
-  </div>
-  <div class="footer-note">
-    * 对比基于提供的两份配置，已隐去节点信息。内存/GC 参数已考虑群友之前因规则排序导致冒烟的特殊情况。
-  </div>
-</div>
+            <!-- 卡片5：规则集来源分布 -->
+            <div class="card">
+                <h3><span class="icon">📦</span>规则集来源分布</h3>
+                <p class="desc">按来源统计：SagerNet · DustinWin · MetaCubeX · senshinya · 其他</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartRuleSetSources"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 第三行：功能特性矩阵 ==================== -->
+        <div class="grid-3">
+            <!-- 卡片6：入站特性对比 -->
+            <div class="card">
+                <h3><span class="icon">📥</span>入站(TUN)特性支持</h3>
+                <p class="desc">strict_route · endpoint_independent_nat · stack类型 · route_exclude · platform代理等</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartInbound"></canvas>
+                </div>
+            </div>
+
+            <!-- 卡片7：出站策略对比 -->
+            <div class="card">
+                <h3><span class="icon">📤</span>出站策略对比</h3>
+                <p class="desc">selector嵌套层级 · urltest自动测速 · 策略组数量</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartOutbound"></canvas>
+                </div>
+            </div>
+
+            <!-- 卡片8：高级功能支持矩阵 -->
+            <div class="card">
+                <h3><span class="icon">🔧</span>高级功能支持矩阵</h3>
+                <p class="desc">reality · optimistic DNS · sniff · utls · tcp_fast_open · udp_fragment等</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartFeatures"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 第四行：DNS规则动作分布 + 综合评分 ==================== -->
+        <div class="grid">
+            <!-- 卡片9：DNS规则动作分布 -->
+            <div class="card">
+                <h3><span class="icon">🎯</span>DNS规则动作分布</h3>
+                <p class="desc">reject · predefined(NOERROR) · route(指定服务器) · evaluate · respond等</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartDnsActions"></canvas>
+                </div>
+            </div>
+
+            <!-- 卡片10：综合能力雷达图 -->
+            <div class="card">
+                <h3><span class="icon">🎖️</span>综合能力雷达图</h3>
+                <p class="desc">8维度综合评估：去广告·隐私保护·性能·灵活性·稳定性·覆盖度·精细化·扩展性</p>
+                <div class="chart-wrap tall">
+                    <canvas id="chartRadar"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 第五行：细节对比表 ==================== -->
+        <div class="card" style="margin-bottom:18px;">
+            <h3><span class="icon">📋</span>关键参数逐项对比表</h3>
+            <p class="desc">覆盖DNS、入站、出站、路由、实验性功能等核心参数</p>
+            <div style="overflow-x:auto;">
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>对比维度</th>
+                            <th>具体参数</th>
+                            <th>皮卡皮卡配置</th>
+                            <th>Danny Luo配置</th>
+                            <th>差异说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="3">📝 日志</td>
+                            <td>级别</td>
+                            <td class="val-user">trace</td>
+                            <td class="val-friend">warn</td>
+                            <td>皮卡皮卡更详细(调试用)，Danny Luo更安静(生产用)</td>
+                        </tr>
+                        <tr>
+                            <td>timestamp</td>
+                            <td class="val-equal">✅ true</td>
+                            <td class="val-equal">✅ true</td>
+                            <td>一致</td>
+                        </tr>
+                        <tr>
+                            <td>disabled</td>
+                            <td class="val-equal">未设置(false)</td>
+                            <td class="val-equal">false</td>
+                            <td>一致</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="5">🌐 DNS</td>
+                            <td>服务器总数</td>
+                            <td class="val-user">7个</td>
+                            <td class="val-friend">6个</td>
+                            <td>你多1个(有独立DoT)</td>
+                        </tr>
+                        <tr>
+                            <td>缓存容量</td>
+                            <td class="val-user">65,536 <span class="winner-badge winner-user">8x</span></td>
+                            <td class="val-friend">8,192</td>
+                            <td>皮卡皮卡缓存容量是Danny Luo的8倍</td>
+                        </tr>
+                        <tr>
+                            <td>optimistic</td>
+                            <td class="val-equal">✅ true</td>
+                            <td class="val-equal">✅ enabled:true, timeout:7d</td>
+                            <td>Danny Luo额外设置了7天超时</td>
+                        </tr>
+                        <tr>
+                            <td>strategy</td>
+                            <td class="val-equal">prefer_ipv4</td>
+                            <td class="val-equal">prefer_ipv4</td>
+                            <td>一致</td>
+                        </tr>
+                        <tr>
+                            <td>reverse_mapping</td>
+                            <td class="val-equal">✅ true</td>
+                            <td class="val-equal">✅ true</td>
+                            <td>一致</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">📥 入站</td>
+                            <td>TUN stack</td>
+                            <td class="val-user">mixed</td>
+                            <td class="val-friend">gvisor</td>
+                            <td>不同实现，gvisor更隔离</td>
+                        </tr>
+                        <tr>
+                            <td>mixed端口</td>
+                            <td class="val-user">7890</td>
+                            <td class="val-friend">8543</td>
+                            <td>端口不同</td>
+                        </tr>
+                        <tr>
+                            <td>TUN地址</td>
+                            <td class="val-user">10.8.0.1/24</td>
+                            <td class="val-friend">172.19.0.1/30 + IPv6</td>
+                            <td>Danny Luo有IPv6 TUN地址</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="4">📤 出站</td>
+                            <td>urltest自动测速</td>
+                            <td class="val-user">✅ AUTO (14节点)</td>
+                            <td class="val-friend">❌ 无</td>
+                            <td>独有功能，自动选最优节点</td>
+                        </tr>
+                        <tr>
+                            <td>CN策略组</td>
+                            <td class="val-user">✅ CN selector</td>
+                            <td class="val-friend">❌ 无独立CN组</td>
+                            <td>你有独立中国流量策略组</td>
+                        </tr>
+                        <tr>
+                            <td>GLOBAL策略组</td>
+                            <td class="val-user">✅ GLOBAL selector</td>
+                            <td class="val-friend">❌ 无</td>
+                            <td>你有全局策略切换组</td>
+                        </tr>
+                        <tr>
+                            <td>reality</td>
+                            <td class="val-friend">❌ 无(使用WS+TLS)</td>
+                            <td class="val-user">✅ reality+xtls-flow</td>
+                            <td>Danny Luo使用reality协议</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">🧪 实验性</td>
+                            <td>clash_api secret</td>
+                            <td class="val-equal">✅ 已设置</td>
+                            <td class="val-equal">✅ 已设置</td>
+                            <td>一致</td>
+                        </tr>
+                        <tr>
+                            <td>debug memory_limit</td>
+                            <td class="val-user">400MB</td>
+                            <td class="val-friend">1024MB</td>
+                            <td>Danny Luo内存上限更高</td>
+                        </tr>
+                        <tr>
+                            <td>debug gc_percent</td>
+                            <td class="val-user">100</td>
+                            <td class="val-friend">200</td>
+                            <td>Danny LuoGC触发阈值更高</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 总结卡片 -->
+        <div class="card" style="border-left: 3px solid #d2a8ff; margin-bottom:18px;">
+            <h3><span class="icon">💡</span>对比总结</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:8px;font-size:0.85rem;">
+                <div style="flex:1;min-width:250px;padding:12px;background:rgba(88,166,255,0.08);border-radius:10px;">
+                    <strong style="color:#58a6ff;">🔵 皮卡皮卡配置优势：</strong>
+                    <ul style="margin:8px 0 0 16px;color:#c9d1d9;">
+                        <li>DNS缓存容量大(65536)，查询效率更高</li>
+                        <li>urltest自动测速，14节点自动选优</li>
+                        <li>独立CN/GLOBAL策略组，切换灵活</li>
+                        <li>trace日志便于深度调试</li>
+                        <li>规则集覆盖更广(+9个远程规则集)</li>
+                        <li>DoT独立服务器，国内解析更稳定</li>
+                    </ul>
+                </div>
+                <div style="flex:1;min-width:250px;padding:12px;background:rgba(247,129,102,0.08);border-radius:10px;">
+                    <strong style="color:#f78166;">🟠 Danny Luo配置优势：</strong>
+                    <ul style="margin:8px 0 0 16px;color:#c9d1d9;">
+                        <li>gvisor TUN栈更安全隔离</li>
+                        <li>reality协议抗封锁能力更强</li>
+                        <li>endpoint_independent_nat NAT穿透更好</li>
+                        <li>route_exclude_address_set智能分流</li>
+                        <li>platform http_proxy兼容性更佳</li>
+                        <li>H3(HTTP/3)DNS over QUIC更现代</li>
+                        <li>warn日志级别减少性能开销</li>
+                    </ul>
+                </div>
+                <div style="flex:1;min-width:250px;padding:12px;background:rgba(210,168,255,0.08);border-radius:10px;">
+                    <strong style="color:#d2a8ff;">🟣 共同优秀实践：</strong>
+                    <ul style="margin:8px 0 0 16px;color:#c9d1d9;">
+                        <li>均启用fakeip加速响应</li>
+                        <li>均有clash_api便于外部管理</li>
+                        <li>均启用optimistic DNS缓存</li>
+                        <li>均配置了hosts预定义解析</li>
+                        <li>均启用sniff协议嗅探</li>
+                        <li>均使用prefer_ipv4策略</li>
+                        <li>均配置了广告/跟踪拦截规则</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            📊 Sing-Box Config Comparison Dashboard · 基于1.14.0-alpha.18日志分析 · 全面模块级对比 · 仅供参考
+        </footer>
+    </div>
+
+    <script>
+        // ============ 通用Chart.js配置 ============
+        Chart.defaults.font.family = "'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans SC',system-ui,sans-serif";
+        Chart.defaults.font.size = 11;
+        Chart.defaults.color = '#8b949e';
+        Chart.defaults.plugins.tooltip.backgroundColor = '#1c2128';
+        Chart.defaults.plugins.tooltip.borderColor = '#30363d';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.tooltip.titleFont = { size: 12, weight: 'bold' };
+        Chart.defaults.plugins.tooltip.bodyFont = { size: 11 };
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        Chart.defaults.plugins.legend.labels.pointStyleWidth = 10;
+        Chart.defaults.plugins.legend.labels.padding = 16;
+
+        const userColor = '#58a6ff';
+        const userColorBg = 'rgba(88,166,255,0.25)';
+        const userColorBorder = 'rgba(88,166,255,0.7)';
+        const friendColor = '#f78166';
+        const friendColorBg = 'rgba(247,129,102,0.25)';
+        const friendColorBorder = 'rgba(247,129,102,0.7)';
+        const gridColor = 'rgba(48,54,61,0.5)';
+
+        // ============ 图表1：配置规模总览 ============
+        new Chart(document.getElementById('chartScale'), {
+            type: 'bar',
+            data: {
+                labels: ['DNS服务器', 'DNS规则', '路由规则', '规则集(远程)', '出站(不含节点)', '入站'],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [7, 16, 26, 34, 7, 2],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [6, 14, 20, 25, 6, 2],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 10 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 5 },
+                        beginAtZero: true, title: { display: true, text: '数量', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表2：DNS服务器分布 ============
+        new Chart(document.getElementById('chartDnsServers'), {
+            type: 'bar',
+            data: {
+                labels: ['local', 'hosts', 'DoT(TLS)', 'DoH(HTTPS)', 'DoQ(QUIC)', 'fakeip', 'H3(HTTP/3)'],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [1, 1, 1, 1, 1, 1, 0],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [1, 1, 0, 0, 2, 1, 1],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 10 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 1, precision: 0 },
+                        beginAtZero: true, max: 3, title: { display: true, text: '数量', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表3：DNS缓存容量 & 日志级别 ============
+        new Chart(document.getElementById('chartCacheLog'), {
+            type: 'bar',
+            data: {
+                labels: ['DNS缓存容量\n(相对值÷1000)', '日志级别\n(trace=5,warn=2)', 'NTP间隔\n(分钟)'],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [65.536, 5, 30],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [8.192, 2, 30],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 9 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9' }, beginAtZero: true,
+                        title: { display: true, text: '数值', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表4：路由规则分类 ============
+        new Chart(document.getElementById('chartRouteRules'), {
+            type: 'bar',
+            data: {
+                labels: ['reject/drop', 'outbound DIRECT', 'outbound PROXY', 'hijack-dns', 'sniff', 'resolve',
+                    'route-options', '其他'
+                ],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [10, 8, 6, 1, 1, 1, 1, 1],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [8, 7, 5, 1, 1, 1, 1, 0],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 9 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 2, precision: 0 },
+                        beginAtZero: true, title: { display: true, text: '规则条数', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表5：规则集来源分布 ============
+        new Chart(document.getElementById('chartRuleSetSources'), {
+            type: 'bar',
+            data: {
+                labels: ['DustinWin', 'SagerNet', 'MetaCubeX', 'senshinya', 'hwsaya', '217heidai'],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [13, 5, 6, 6, 1, 1],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [3, 10, 7, 5, 0, 0],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 9 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 3, precision: 0 },
+                        beginAtZero: true, title: { display: true, text: '规则集数量', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表6：入站特性 ============
+        new Chart(document.getElementById('chartInbound'), {
+            type: 'bar',
+            data: {
+                labels: ['strict\n_route', 'endpoint\n_independent\n_nat', 'route\n_exclude\n_address_set',
+                    'platform\n_http_proxy', 'override\n_android\n_vpn', 'gvisor\n_stack', 'mixed\n_stack',
+                    'IPv6\n_TUN', 'auto\n_redirect'
+                ],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [1, 0, 0, 0, 0, 0, 1, 0, 0],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [0, 1, 1, 1, 1, 1, 0, 1, 1],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 8 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 1, precision: 0, max: 2 },
+                        beginAtZero: true, title: { display: true, text: '支持(1=是)', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表7：出站策略 ============
+        new Chart(document.getElementById('chartOutbound'), {
+            type: 'bar',
+            data: {
+                labels: ['selector\n策略组', 'urltest\n自动测速', 'CN独立\n策略组', 'GLOBAL\n策略组', 'reality\n协议',
+                    'xtls-flow', 'ws传输', 'tcp_fast\n_open'
+                ],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [3, 1, 1, 1, 0, 0, 1, 1],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [3, 0, 0, 0, 1, 1, 0, 1],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 8 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 1, precision: 0, max: 4 },
+                        beginAtZero: true, title: { display: true, text: '数量/支持', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表8：高级功能支持矩阵 ============
+        new Chart(document.getElementById('chartFeatures'), {
+            type: 'bar',
+            data: {
+                labels: ['optimistic\nDNS', 'sniff', 'utls', 'udp\n_fragment', 'prefer\n_ipv4', 'auto_detect\n_interface',
+                    'store\n_dns', 'store\n_fakeip', 'clash\n_api', 'reverse\n_mapping'
+                ],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 8 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 1, precision: 0, max: 2 },
+                        beginAtZero: true, title: { display: true, text: '支持(1=是)', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表9：DNS规则动作分布 ============
+        new Chart(document.getElementById('chartDnsActions'), {
+            type: 'bar',
+            data: {
+                labels: ['reject', 'predefined\n(NOERROR)', 'route\n(指定服务器)', 'evaluate', 'respond', 'route\n(local)'],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [2, 3, 7, 1, 1, 2],
+                    backgroundColor: userColorBg,
+                    borderColor: userColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [0, 3, 8, 1, 0, 2],
+                    backgroundColor: friendColorBg,
+                    borderColor: friendColorBorder,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    x: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', font: { size: 9 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: '#c9d1d9', stepSize: 2, precision: 0 },
+                        beginAtZero: true, title: { display: true, text: '规则条数', color: '#8b949e' } }
+                }
+            }
+        });
+
+        // ============ 图表10：综合能力雷达图 ============
+        new Chart(document.getElementById('chartRadar'), {
+            type: 'radar',
+            data: {
+                labels: ['去广告能力', '隐私保护', '解析性能', '配置灵活性', '连接稳定性', '规则覆盖度', '分流精细化',
+                '扩展性'],
+                datasets: [{
+                    label: '皮卡皮卡配置',
+                    data: [88, 82, 90, 92, 78, 95, 85, 88],
+                    backgroundColor: 'rgba(88,166,255,0.15)',
+                    borderColor: userColor,
+                    borderWidth: 3,
+                    pointBackgroundColor: userColor,
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                }, {
+                    label: 'Danny Luo配置',
+                    data: [82, 88, 78, 80, 90, 80, 88, 82],
+                    backgroundColor: 'rgba(247,129,102,0.15)',
+                    borderColor: friendColor,
+                    borderWidth: 3,
+                    pointBackgroundColor: friendColor,
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e6edf3', padding: 20 } }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { color: '#8b949e', backdropColor: 'transparent', stepSize: 20, font: { size: 9 } },
+                        grid: { color: 'rgba(48,54,61,0.7)' },
+                        angleLines: { color: 'rgba(48,54,61,0.7)' },
+                        pointLabels: { color: '#c9d1d9', font: { size: 10, weight: '500' } },
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
