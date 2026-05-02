@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Sing-Box 配置全维度对比分析大屏</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-    <!-- 移除中国地图依赖，以避免加载失败 -->
     <style>
         :root {
             --bg: #0a0e17;
@@ -229,7 +228,6 @@
         <div class="chart-wrap" id="chartInbound" style="height:350px;"></div>
     </div>
 
-    <!-- ========= 替换后四个图表 ========= -->
     <!-- 第4行：综合评分排名条形图 + 配置维度贡献堆叠图 -->
     <div class="panel span-2" style="min-height:420px;">
         <div class="panel-header"><span class="panel-title"><span class="dot dot-gold"></span>综合评分排名（满分💯）</span><span style="font-size:0.7rem;color:#94a3b8;">降序排列</span></div>
@@ -264,7 +262,7 @@
 
     <div class="footer-note full-width">
         📊 数据基于12套真实 Sing-Box JSON 配置 | 综合评分 = DNS×0.25 + 路由×0.3 + 出站×0.2 + 规则集×0.15 + 入站×0.1 |
-        您的「皮卡皮卡配置」在所有图表中以 <span style="color:#fbbf24;">★金色★</span> 高亮 | 数据更新：2026-04-28
+        您的「皮卡皮卡配置」在所有图表中以 <span style="color:#fbbf24;">★金色★</span> 高亮 | 数据更新：2026-05-02
     </div>
 </div>
 
@@ -283,13 +281,13 @@
 
     const USER_INDEX = 2; // 皮卡皮卡配置
 
-    // 各维度数据
-    const dnsServers = [9,10,8,7,6,4,9,4,4,4,6,4];
-    const dnsRules = [10,9,17,12,13,7,9,7,17,6,13,3];
-    const outbounds = [12,5,21,38,6,3,15,2,42,5,6,19];
-    const routeRules = [20,10,26,34,20,9,23,9,41,13,20,14];
-    const ruleSets = [17,10,36,44,24,6,18,6,38,7,24,17];
-    const inboundTypes = [2,2,2,3,2,2,2,2,5,3,2,2];
+    // 各维度数据（已根据 config.json 全面更新皮卡皮卡项）
+    const dnsServers = [9,10,14,7,6,4,9,4,4,4,6,4];          // 皮卡皮卡: 14
+    const dnsRules = [10,9,23,12,13,7,9,7,17,6,13,3];         // 皮卡皮卡: 23
+    const outbounds = [12,5,53,38,6,3,15,2,42,5,6,19];        // 皮卡皮卡: 53
+    const routeRules = [20,10,36,34,20,9,23,9,41,13,20,14];   // 皮卡皮卡: 36
+    const ruleSets = [17,10,46,44,24,6,18,6,38,7,24,17];      // 皮卡皮卡: 46
+    const inboundTypes = [2,2,7,3,2,2,2,2,5,3,2,2];           // 皮卡皮卡: 7
 
     const featureData = {
         'FakeIP':       [0,1,1,1,1,1,1,1,1,1,1,1],
@@ -308,8 +306,12 @@
     const inboundDetails = {
         'tun':      [1,1,1,1,1,1,1,1,1,0,1,1],
         'mixed':    [1,1,1,1,1,1,1,1,1,1,1,1],
+        'http':     [0,0,1,0,0,0,0,0,1,0,0,0],
+        'socks':    [0,0,1,0,0,0,0,0,1,0,0,0],
+        'redirect': [0,0,1,0,0,0,0,0,1,1,0,0],
+        'vmess':    [0,0,1,0,0,0,0,0,1,0,0,0],
+        'vless':    [0,0,1,0,0,0,0,0,1,0,0,0],
         'tproxy':   [0,0,0,1,0,0,0,0,1,1,0,0],
-        'redirect': [0,0,0,0,0,0,0,0,1,1,0,0],
         'dns-in':   [0,0,0,0,0,0,0,0,1,0,0,0],
     };
 
@@ -445,14 +447,17 @@
     (function(){
         const c = initChart('chartInbound'); if(!c) return;
         const types = Object.keys(inboundDetails);
-        const colorMap = {tun:'#3b82f6',mixed:'#10b981',tproxy:'#f97316',redirect:'#8b5cf6','dns-in':'#ec4899'};
-        const series = types.map(tn=>({ name:tn, type:'bar', stack:'total', data:inboundDetails[tn], itemStyle:{color:colorMap[tn],borderRadius:tn==='dns-in'?[6,6,0,0]:2} }));
+        const colorMap = {
+            'tun':'#3b82f6','mixed':'#10b981','http':'#f59e0b','socks':'#8b5cf6',
+            'redirect':'#f97316','vmess':'#ec4899','vless':'#06b6d4','tproxy':'#a855f7','dns-in':'#e11d48'
+        };
+        const series = types.map(tn=>({ name:tn, type:'bar', stack:'total', data:inboundDetails[tn], itemStyle:{color:colorMap[tn]||'#94a3b8'} }));
         c.setOption({
             tooltip:{ trigger:'axis', backgroundColor:'#1e293b', borderColor:'#334155', textStyle:{color:'#f1f5f9'}, axisPointer:{type:'shadow'} },
             legend:{ data:types, textStyle:{color:'#94a3b8',fontSize:9}, top:0 },
             grid:{ left:'6%', right:'4%', top:'14%', bottom:'8%' },
             xAxis:{ type:'category', data:configShort, axisLabel:{rotate:40,fontSize:9,color:'#94a3b8'} },
-            yAxis:{ type:'value', splitLine:{lineStyle:{color:'#1e293b',type:'dashed'}}, max:6 },
+            yAxis:{ type:'value', splitLine:{lineStyle:{color:'#1e293b',type:'dashed'}}, max:8 },
             series
         });
         window.addEventListener('resize', ()=>c.resize());
@@ -478,7 +483,6 @@
     // ---- 配置维度贡献堆叠图 ----
     (function(){
         const c = initChart('chartStackContrib'); if(!c) return;
-        // 计算各维度原始分数贡献（非归一化），用于堆叠展示
         const dnsContrib = configNames.map((_,i)=>(dnsServers[i]/10*0.25 + dnsRules[i]/17*0.25)*100);
         const routeContrib = configNames.map((_,i)=>(routeRules[i]/42*0.3)*100);
         const outContrib = configNames.map((_,i)=>(outbounds[i]/42*0.2)*100);
@@ -566,7 +570,7 @@
         });
     })();
 
-    console.log('✅ 新版大屏已加载，包含排行榜、仪表盘和替换后的四个图表。');
+    console.log('✅ 皮卡皮卡配置数据已基于最新 config.json 全面更新：DNS服务器14，路由规则36，规则集46，入站类型7。');
 })();
 </script>
 </body>
